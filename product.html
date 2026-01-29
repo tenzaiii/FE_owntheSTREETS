@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Product - owntheSTREETS</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="bg-black text-gray-900">
+  <!-- Announcement Bar -->
+  <div class="bg-black border-b border-gray-800 overflow-hidden">
+    <div class="announcement-slide whitespace-nowrap py-2 text-center text-sm font-bold text-white">
+      <span class="inline-block px-8">FREE SHIPPING ON ORDERS $50+</span>
+      <span class="inline-block px-8">|</span>
+      <span class="inline-block px-8">HOLIDAY SALE - UP TO 40% OFF</span>
+      <span class="inline-block px-8">|</span>
+      <span class="inline-block px-8">NEW ARRIVALS DAILY</span>
+      <span class="inline-block px-8">|</span>
+      <span class="inline-block px-8">FREE SHIPPING ON ORDERS $50+</span>
+      <span class="inline-block px-8">|</span>
+      <span class="inline-block px-8">HOLIDAY SALE - UP TO 40% OFF</span>
+      <span class="inline-block px-8">|</span>
+      <span class="inline-block px-8">NEW ARRIVALS DAILY</span>
+      <span class="inline-block px-8">|</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="sticky top-0 z-50 bg-black text-white transition-all duration-300">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between gap-3 py-3 sm:py-4">
+        <!-- Logo -->
+        <div class="flex items-center min-w-0">
+          <a href="index.html" class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight truncate">
+            owntheSTREETS
+          </a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden lg:flex items-center space-x-8">
+          <a href="index.html#top" class="hover:text-gray-300 transition font-medium">FEATURED</a>
+          <a href="catalog.html" class="hover:text-gray-300 transition font-medium">CATALOG</a>
+          <a href="#" class="hover:text-gray-300 transition font-medium">APPAREL</a>
+          <a href="#" class="hover:text-gray-300 transition font-medium">HEADWEAR</a>
+          <a href="#" class="hover:text-gray-300 transition font-medium">BRANDS</a>
+          <a href="#" class="hover:text-gray-300 transition font-medium">COLLECTIONS</a>
+          <a href="#" class="text-red-500 hover:text-red-400 transition font-bold">SALE</a>
+        </div>
+
+        <!-- Right Icons -->
+        <div class="flex items-center flex-shrink-0 space-x-4 sm:space-x-6">
+          <button class="hidden sm:inline-flex hover:text-gray-300 transition" aria-label="Search">
+            <i class="fas fa-search text-lg"></i>
+          </button>
+          <button class="hidden sm:inline-flex hover:text-gray-300 transition" aria-label="Account">
+            <i class="fas fa-user text-lg"></i>
+          </button>
+          <button class="hover:text-gray-300 transition relative" aria-label="Shopping bag">
+            <i class="fas fa-shopping-bag text-lg"></i>
+            <span
+              class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+          <button class="lg:hidden hover:text-gray-300 transition" id="mobile-menu-btn" aria-label="Open menu">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-full h-full bg-black z-50 lg:hidden">
+      <div class="flex flex-col h-full">
+        <div class="flex justify-between items-center p-4 border-b border-gray-800">
+          <span class="text-xl font-black">MENU</span>
+          <button id="close-menu" class="text-2xl">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+          <div class="flex flex-col space-y-4 p-6">
+            <a href="index.html#top" class="hover:text-gray-300 transition font-medium">FEATURED</a>
+            <a href="catalog.html" class="hover:text-gray-300 transition font-medium">CATALOG</a>
+            <a href="#" class="hover:text-gray-300 transition font-medium">APPAREL</a>
+            <a href="#" class="hover:text-gray-300 transition font-medium">HEADWEAR</a>
+            <a href="#" class="hover:text-gray-300 transition font-medium">BRANDS</a>
+            <a href="#" class="hover:text-gray-300 transition font-medium">COLLECTIONS</a>
+            <a href="#" class="text-red-500 hover:text-red-400 transition font-bold">SALE</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Product Page -->
+  <section class="bg-black text-white py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <!-- Breadcrumb -->
+      <div class="mb-6">
+        <p class="text-xs uppercase tracking-wide text-gray-400">
+          <a href="index.html" class="hover:text-white transition">Home</a> / 
+          <a href="catalog.html" class="hover:text-white transition">Catalog</a> / 
+          <span id="product-breadcrumb" class="text-gray-500">Product</span>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+        <!-- Product Images -->
+        <div class="space-y-4">
+          <!-- Main Image -->
+          <div class="relative bg-gray-900 rounded-2xl overflow-hidden aspect-square">
+            <img
+              id="product-main-image"
+              src=""
+              alt=""
+              class="w-full h-full object-contain bg-gradient-to-br from-gray-900 via-black to-gray-800"
+            />
+            <button
+              id="product-favorite-btn"
+              class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-gray-700 hover:border-white hover:bg-white hover:text-black transition-colors"
+              aria-label="Add to favorites"
+            >
+              <i class="far fa-heart text-lg"></i>
+            </button>
+          </div>
+
+          <!-- Thumbnail Gallery -->
+          <div id="product-thumbnails" class="flex gap-3 overflow-x-auto pb-2">
+            <!-- Thumbnails rendered by script.js -->
+          </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="space-y-6">
+          <!-- Brand & Tag -->
+          <div class="flex items-start justify-between">
+            <div>
+              <p id="product-brand" class="text-sm uppercase tracking-wide text-gray-400 mb-2"></p>
+              <h1 id="product-title" class="text-2xl md:text-3xl font-bold tracking-tight mb-2"></h1>
+            </div>
+            <span id="product-tag" class="hidden inline-flex items-center rounded-full bg-white text-black text-xs font-semibold tracking-wide px-3 py-1 uppercase"></span>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <p id="product-price" class="text-3xl font-bold"></p>
+          </div>
+
+          <!-- Size Selector -->
+          <div>
+            <label class="block text-sm font-semibold uppercase tracking-wide mb-3">
+              Size
+            </label>
+            <div id="product-sizes" class="flex flex-wrap gap-3">
+              <!-- Size buttons rendered by script.js -->
+            </div>
+            <a href="#" class="mt-3 text-xs text-gray-400 hover:text-white underline underline-offset-4 inline-block">
+              Size Chart
+            </a>
+          </div>
+
+          <!-- Add to Cart Button -->
+          <div class="space-y-3">
+            <button
+              id="product-add-to-cart"
+              class="w-full bg-white text-black py-4 px-6 font-bold text-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
+            >
+              Add to Bag
+            </button>
+            <p id="product-size-error" class="hidden text-sm text-red-500 text-center"></p>
+          </div>
+
+          <!-- Description -->
+          <div class="pt-6 border-t border-gray-800">
+            <h2 class="text-lg font-bold mb-4">Description</h2>
+            <p id="product-description" class="text-sm text-gray-400 leading-relaxed"></p>
+            <div class="mt-4 pt-4 border-t border-gray-800">
+              <p class="text-xs text-gray-500">
+                <span class="font-semibold">SKU:</span> <span id="product-sku"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Products -->
+      <div class="border-t border-gray-800 pt-12">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl md:text-3xl font-bold tracking-tight">You May Also Like</h2>
+          <div class="flex gap-2">
+            <button
+              id="suggested-prev"
+              class="w-10 h-10 border border-gray-700 hover:border-white hover:bg-white hover:text-black flex items-center justify-center transition-colors"
+              aria-label="Previous"
+            >
+              <i class="fas fa-chevron-left text-sm"></i>
+            </button>
+            <button
+              id="suggested-next"
+              class="w-10 h-10 border border-gray-700 hover:border-white hover:bg-white hover:text-black flex items-center justify-center transition-colors"
+              aria-label="Next"
+            >
+              <i class="fas fa-chevron-right text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="suggested-products" class="relative overflow-hidden">
+          <div id="suggested-slider" class="flex gap-6 transition-transform duration-500 ease-out">
+            <!-- Suggested products rendered by script.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black text-white py-16 border-t border-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <!-- Company Info -->
+        <div>
+          <h3 class="text-Xl font-black mb-6">owntheSTREETS</h3>
+          <p class="text-gray-400 mb-4">
+            Founded in 1920 in Buffalo, NY. A global brand of sport, culture,
+            style, & self-expression.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-2xl hover:text-gray-400 transition">
+              <i class="fab fa-facebook"></i>
+            </a>
+            <a href="#" class="text-2xl hover:text-gray-400 transition">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-2xl hover:text-gray-400 transition">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-2xl hover:text-gray-400 transition">
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-bold mb-6">SHOP</h4>
+          <ul class="space-y-3">
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">MLB</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">NFL</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">NBA</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">NHL</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Collections</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Sale</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div>
+          <h4 class="text-lg font-bold mb-6">CUSTOMER SERVICE</h4>
+          <ul class="space-y-3">
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Contact Us</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Shipping & Returns</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Size Guide</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Track Order</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">FAQ</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- About -->
+        <div>
+          <h4 class="text-lg font-bold mb-6">ABOUT</h4>
+          <ul class="space-y-3">
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Our Story</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Careers</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Press</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Sustainability</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-400 hover:text-white transition">Store Locator</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-800 pt-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p class="text-gray-400 text-sm mb-4 md:mb-0">
+            © 2024 owntheSTREETS Co., LLC. All Rights Reserved.
+          </p>
+          <div class="flex space-x-6 text-sm">
+            <a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a>
+            <a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a>
+            <a href="#" class="text-gray-400 hover:text-white transition">Accessibility</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="catalog-data.js"></script>
+  <script src="product.js"></script>
+</body>
+
+</html>

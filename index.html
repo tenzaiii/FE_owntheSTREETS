@@ -39,18 +39,18 @@
   <!-- Navigation -->
   <nav id="navbar" class="sticky top-0 z-50 bg-black text-white transition-all duration-300">
     <div class="container mx-auto px-4">
-      <div class="flex items-center justify-between py-4">
+      <div class="flex items-center justify-between gap-3 py-3 sm:py-4">
         <!-- Logo -->
-        <div class="flex items-center space-x-8">
-          <a href="index.html" class="text-2xl font-black tracking-tight">
+        <div class="flex items-center min-w-0">
+          <a href="index.html" class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight truncate">
             owntheSTREETS
           </a>
         </div>
 
         <!-- Desktop Navigation -->
         <div class="hidden lg:flex items-center space-x-8">
-          <a href="#" class="hover:text-gray-300 transition font-medium">FEATURED</a>
-          <a href="#" class="hover:text-gray-300 transition font-medium">CATALOG</a>
+          <a href="#top" class="hover:text-gray-300 transition font-medium">FEATURED</a>
+          <a href="catalog.html" class="hover:text-gray-300 transition font-medium">CATALOG</a>
           <a href="#" class="hover:text-gray-300 transition font-medium">APPAREL</a>
           <a href="#" class="hover:text-gray-300 transition font-medium">HEADWEAR</a>
           <a href="#" class="hover:text-gray-300 transition font-medium">BRANDS</a>
@@ -59,19 +59,19 @@
         </div>
 
         <!-- Right Icons -->
-        <div class="flex items-center space-x-6">
-          <button class="hover:text-gray-300 transition">
+        <div class="flex items-center flex-shrink-0 space-x-4 sm:space-x-6">
+          <button class="hidden sm:inline-flex hover:text-gray-300 transition" aria-label="Search">
             <i class="fas fa-search text-lg"></i>
           </button>
-          <button class="hover:text-gray-300 transition">
+          <button class="hidden sm:inline-flex hover:text-gray-300 transition" aria-label="Account">
             <i class="fas fa-user text-lg"></i>
           </button>
-          <button class="hover:text-gray-300 transition relative">
+          <button class="hover:text-gray-300 transition relative" aria-label="Shopping bag">
             <i class="fas fa-shopping-bag text-lg"></i>
             <span
               class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
           </button>
-          <button class="lg:hidden hover:text-gray-300 transition" id="mobile-menu-btn">
+          <button class="lg:hidden hover:text-gray-300 transition" id="mobile-menu-btn" aria-label="Open menu">
             <i class="fas fa-bars text-xl"></i>
           </button>
         </div>
@@ -89,8 +89,8 @@
         </div>
         <div class="flex-1 overflow-y-auto">
           <div class="flex flex-col space-y-4 p-6">
-            <a href="#" class="hover:text-gray-300 transition font-medium">FEATURED</a>
-            <a href="#" class="hover:text-gray-300 transition font-medium">CATALOG</a>
+            <a href="#top" class="hover:text-gray-300 transition font-medium">FEATURED</a>
+            <a href="catalog.html" class="hover:text-gray-300 transition font-medium">CATALOG</a>
             <a href="#" class="hover:text-gray-300 transition font-medium">APPAREL</a>
             <a href="#" class="hover:text-gray-300 transition font-medium">HEADWEAR</a>
             <a href="#" class="hover:text-gray-300 transition font-medium">BRANDS</a>
@@ -102,7 +102,7 @@
     </div>
   </nav>
   <!-- Hero Section with Parallax -->
-  <section class="relative h-screen parallax-container overflow-hidden">
+  <section id="top" class="relative h-screen parallax-container overflow-hidden">
     <div class="hero-bg absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800">
       <div class="absolute inset-0 opacity-20" style="
             background-image: url(&quot;IMG/esnlPlaceholder.jpg&quot;);
@@ -431,6 +431,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+  <script src="catalog-data.js"></script>
   <script src="script.js"></script>
 </body>
 
