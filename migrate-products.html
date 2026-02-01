@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Migration Tool - owntheSTREETS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #0a0a0a;
+        color: #fff;
+      }
+      .container {
+        background: #1a1a1a;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #333;
+      }
+      h1 {
+        color: #fff;
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .success {
+        background: #1a3d1a;
+        border: 1px solid #2d5f2d;
+      }
+      .error {
+        background: #3d1a1a;
+        border: 1px solid #5f2d2d;
+      }
+      .info {
+        background: #1a2a3d;
+        border: 1px solid #2d4a5f;
+      }
+      .warning {
+        background: #3d2a1a;
+        border: 1px solid #5f4a2d;
+      }
+      button {
+        background: #fff;
+        color: #000;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        margin: 10px 5px;
+      }
+      button:hover {
+        background: #ddd;
+      }
+      button:disabled {
+        background: #555;
+        color: #999;
+        cursor: not-allowed;
+      }
+      pre {
+        background: #0a0a0a;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        border: 1px solid #333;
+      }
+      .progress {
+        margin: 20px 0;
+      }
+      .progress-bar {
+        width: 100%;
+        height: 30px;
+        background: #333;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50, #8bc34a);
+        width: 0%;
+        transition: width 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Product Migration to Supabase</h1>
+      <p>
+        This tool will migrate your product catalog from
+        <code>catalog-data.js</code> to Supabase.
+      </p>
+
+      <div class="info status">
+        <strong>Instructions:</strong><br />
+        1. Make sure you've run the SQL schema in Supabase<br />
+        2. Create the 'product-images' storage bucket (set to public)<br />
+        3. Click "Migrate Products" to start
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress">0%</div>
+        </div>
+      </div>
+
+      <button onclick="migrateProducts()" id="migrateBtn">
+        Migrate Products
+      </button>
+      <button onclick="clearProducts()" id="clearBtn">
+        Clear All Products
+      </button>
+
+      <div id="output"></div>
+    </div>
+
+    <script src="supabase-client.js"></script>
+    <script src="catalog-data.js"></script>
+    <script>
+      const output = document.getElementById("output");
+      const progress = document.getElementById("progress");
+      const migrateBtn = document.getElementById("migrateBtn");
+      const clearBtn = document.getElementById("clearBtn");
+
+      function log(message, type = "info") {
+        const div = document.createElement("div");
+        div.className = `status ${type}`;
+        div.innerHTML = message;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function updateProgress(current, total) {
+        const percent = Math.round((current / total) * 100);
+        progress.style.width = percent + "%";
+        progress.textContent = percent + "%";
+      }
+
+      async function clearProducts() {
+        if (
+          !confirm(
+            "Are you sure you want to delete ALL products from Supabase?",
+          )
+        ) {
+          return;
+        }
+
+        clearBtn.disabled = true;
+        log("Deleting all products...", "warning");
+
+        try {
+          const { error } = await supabaseClient
+            .from("products")
+            .delete()
+            .neq("id", 0); // Delete all records
+
+          if (error) throw error;
+
+          log("✅ All products deleted successfully", "success");
+        } catch (error) {
+          log(`❌ Error: ${error.message}`, "error");
+        } finally {
+          clearBtn.disabled = false;
+        }
+      }
+
+      async function migrateProducts() {
+        migrateBtn.disabled = true;
+        clearBtn.disabled = true;
+        output.innerHTML = "";
+
+        const products = window.catalogProducts;
+        log(`Found ${products.length} products to migrate`, "info");
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (let i = 0; i < products.length; i++) {
+          const product = products[i];
+          updateProgress(i, products.length);
+
+          try {
+            // Prepare product data for Supabase
+            const productData = {
+              id: product.id,
+              name: product.name,
+              brand: product.brand,
+              category: product.category,
+              type: product.type,
+              price: product.price,
+              image_url: product.image, // Keep local path for now
+              tag: product.tag || null,
+              sizes: product.sizes || ["One Size"],
+              description: product.description || "",
+            };
+
+            // Insert product
+            const { data, error } = await supabaseClient
+              .from("products")
+              .upsert(productData, { onConflict: "id" })
+              .select();
+
+            if (error) throw error;
+
+            log(`✅ Migrated: ${product.name}`, "success");
+            successCount++;
+          } catch (error) {
+            log(
+              `❌ Failed to migrate "${product.name}": ${error.message}`,
+              "error",
+            );
+            errorCount++;
+          }
+        }
+
+        updateProgress(products.length, products.length);
+
+        log(
+          `<br><strong>Migration Complete!</strong><br>
+                 ✅ Success: ${successCount}<br>
+                 ❌ Errors: ${errorCount}`,
+          "info",
+        );
+
+        migrateBtn.disabled = false;
+        clearBtn.disabled = false;
+
+        if (errorCount === 0) {
+          log(
+            "<br>🎉 All products migrated successfully! You can now update your frontend to load from Supabase.",
+            "success",
+          );
+        }
+      }
+
+      // Check Supabase connection on load
+      window.addEventListener("load", async () => {
+        try {
+          const { data, error } = await supabaseClient
+            .from("products")
+            .select("count");
+
+          if (error) throw error;
+
+          log("✅ Supabase connection successful!", "success");
+          log(`Current products in database: ${data.length || 0}`, "info");
+        } catch (error) {
+          log(`❌ Supabase connection failed: ${error.message}`, "error");
+          log("Please check your supabase-client.js configuration", "warning");
+          migrateBtn.disabled = true;
+        }
+      });
+    </script>
+  </body>
+</html>

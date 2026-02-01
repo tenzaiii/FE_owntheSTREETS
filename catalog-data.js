@@ -229,5 +229,15 @@ window.catalogProducts = [
     tag: "Limited",
     image: "IMG/CHRlogo.png",
   },
+  {
+    id: 63,
+    name: "Los Angeles Dodgers Upside Down Dark Royal 59FIFTY Fitted Cap",
+    brand: "New Era",
+    category: "Headwear",
+    type: "Cap",
+    price: 2695,
+    tag: "Limited",
+    image: "IMG/CATALOG/cap1.webp"
+  },
 ];
 

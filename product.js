@@ -1,35 +1,41 @@
 // Product page functionality
 document.addEventListener("DOMContentLoaded", () => {
-  // Mobile menu toggle
-  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
-  const mobileMenu = document.getElementById("mobile-menu");
-  const closeMenuBtn = document.getElementById("close-menu");
-
-  if (mobileMenuBtn && mobileMenu && closeMenuBtn) {
-    mobileMenuBtn.addEventListener("click", () => {
-      mobileMenu.classList.add("active");
-    });
-
-    closeMenuBtn.addEventListener("click", () => {
-      mobileMenu.classList.remove("active");
-    });
-  }
-
   // Get product ID from URL
   const urlParams = new URLSearchParams(window.location.search);
   const productId = parseInt(urlParams.get("id"));
 
-  if (!productId || !window.catalogProducts) {
+  if (!productId) {
     window.location.href = "catalog.html";
     return;
   }
 
-  // Find product
-  const product = window.catalogProducts.find((p) => p.id === productId);
-  if (!product) {
-    window.location.href = "catalog.html";
-    return;
+  // Mobile menu is handled by script.js now (ensure script.js is included in HTML)
+
+  let product = null;
+
+  // Function to initialize logic once products are available
+  function initializeWhenReady() {
+    if (!window.catalogProducts || window.catalogProducts.length === 0) return;
+
+    product = window.catalogProducts.find((p) => p.id === productId);
+
+    if (!product) {
+      // Product not found after loading
+      window.location.href = "catalog.html";
+      return;
+    }
+
+    initProductPage();
   }
+
+  // Check immediately or wait
+  if (window.productsLoaded && window.catalogProducts.length > 0) {
+    initializeWhenReady();
+  } else {
+    window.addEventListener('productsLoaded', initializeWhenReady);
+  }
+
+  // Logic moved to initializeWhenReady
 
   // Product state
   const state = {
@@ -70,6 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const sizes = product.sizes || (product.type === "Cap" ? ["One Size"] : ["S", "M", "L", "XL"]);
     renderSizes(sizes);
 
+    // Check favorite status
+    state.isFavorite = Favorites.isFavorite(product.id);
+    updateFavoriteBtn();
+
     // Suggested products
     renderSuggestedProducts();
   }
@@ -91,11 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create thumbnails
     images.forEach((img, index) => {
       const thumbnail = document.createElement("button");
-      thumbnail.className = `flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-        index === state.currentImageIndex
-          ? "border-white"
-          : "border-gray-700 hover:border-gray-500"
-      }`;
+      thumbnail.className = `flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${index === state.currentImageIndex
+        ? "border-white"
+        : "border-gray-700 hover:border-gray-500"
+        }`;
       thumbnail.type = "button";
       thumbnail.addEventListener("click", () => {
         state.currentImageIndex = index;
@@ -178,6 +187,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add to cart handler
   document.getElementById("product-add-to-cart").addEventListener("click", () => {
+    if (!Auth.getCurrentUser()) {
+      window.location.href = 'login.html';
+      return;
+    }
+
     if (!state.selectedSize) {
       const sizeError = document.getElementById("product-size-error");
       sizeError.textContent = "Please select a size";
@@ -185,12 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Add to cart logic (placeholder)
-    console.log("Added to cart:", {
-      product: product.name,
-      size: state.selectedSize,
-      price: product.price,
-    });
+    Cart.addItem(product, 1, state.selectedSize);
 
     // Show success feedback
     const btn = document.getElementById("product-add-to-cart");
@@ -203,18 +212,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2000);
   });
 
-  // Favorite handler
-  document.getElementById("product-favorite-btn").addEventListener("click", () => {
-    state.isFavorite = !state.isFavorite;
+  function updateFavoriteBtn() {
     const btn = document.getElementById("product-favorite-btn");
     const icon = btn.querySelector("i");
-
     if (state.isFavorite) {
       icon.classList.remove("far");
       icon.classList.add("fas", "text-red-500");
     } else {
       icon.classList.remove("fas", "text-red-500");
       icon.classList.add("far");
+    }
+  }
+
+  // Favorite handler
+  document.getElementById("product-favorite-btn").addEventListener("click", () => {
+    const success = Favorites.toggle(product.id);
+    if (success) {
+      state.isFavorite = !state.isFavorite;
+      updateFavoriteBtn();
+    } else {
+      // User not logged in
+      const shouldLogin = confirm("Please login to add favorites. Go to login page?");
+      if (shouldLogin) {
+        window.location.href = "login.html";
+      }
     }
   });
 
@@ -247,13 +268,12 @@ document.addEventListener("DOMContentLoaded", () => {
             alt="${p.name}"
             class="w-full h-64 object-contain bg-gradient-to-br from-gray-900 via-black to-gray-800 transform group-hover:scale-105 transition-transform duration-300"
           />
-          ${
-            p.tag
-              ? `<span class="absolute top-3 left-3 inline-flex items-center rounded-full bg-white text-black text-xs font-semibold tracking-wide px-2 py-1 uppercase">
+          ${p.tag
+          ? `<span class="absolute top-3 left-3 inline-flex items-center rounded-full bg-white text-black text-xs font-semibold tracking-wide px-2 py-1 uppercase">
                   ${p.tag}
                 </span>`
-              : ""
-          }
+          : ""
+        }
         </div>
         <div class="flex-1 flex flex-col px-4 py-4 space-y-2">
           <p class="text-xs uppercase tracking-wide text-gray-400">${p.brand}</p>
@@ -269,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
               class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-700 hover:border-white hover:bg-white hover:text-black transition-colors"
               type="button"
               aria-label="Add to bag"
-              onclick="event.preventDefault(); console.log('Add to cart:', ${p.id});"
+              onclick="event.preventDefault(); if(!Auth.getCurrentUser()) { window.location.href='login.html'; return; } Cart.addItem(window.catalogProducts.find(prod => prod.id === ${p.id}), 1, 'One Size')"
             >
               <i class="fas fa-shopping-bag text-sm"></i>
             </button>
@@ -292,25 +312,33 @@ document.addEventListener("DOMContentLoaded", () => {
     slider.style.transform = `translateX(${translateX}px)`;
 
     // Update button states
-    document.getElementById("suggested-prev").disabled = suggestedPosition === 0;
-    document.getElementById("suggested-next").disabled =
-      suggestedPosition >= maxPosition;
+    const prevBtn = document.getElementById("suggested-prev");
+    const nextBtn = document.getElementById("suggested-next");
+
+    if (prevBtn) prevBtn.disabled = suggestedPosition === 0;
+    if (nextBtn) nextBtn.disabled = suggestedPosition >= maxPosition;
   }
 
-  document.getElementById("suggested-prev").addEventListener("click", () => {
-    if (suggestedPosition > 0) {
-      suggestedPosition--;
-      updateSuggestedSlider();
-    }
-  });
+  const prevBtn = document.getElementById("suggested-prev");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (suggestedPosition > 0) {
+        suggestedPosition--;
+        updateSuggestedSlider();
+      }
+    });
+  }
 
-  document.getElementById("suggested-next").addEventListener("click", () => {
-    const maxPosition = Math.max(0, suggestedProducts.length - 4);
-    if (suggestedPosition < maxPosition) {
-      suggestedPosition++;
-      updateSuggestedSlider();
-    }
-  });
+  const nextBtn = document.getElementById("suggested-next");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const maxPosition = Math.max(0, suggestedProducts.length - 4);
+      if (suggestedPosition < maxPosition) {
+        suggestedPosition++;
+        updateSuggestedSlider();
+      }
+    });
+  }
 
   // Initialize
   initProductPage();
