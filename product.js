@@ -241,11 +241,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Suggested products slider
   let suggestedPosition = 0;
-  const suggestedProducts = window.catalogProducts
-    .filter((p) => p.id !== product.id && p.brand === product.brand)
-    .slice(0, 8);
+  let suggestedProducts = [];
 
   function renderSuggestedProducts() {
+    // Filter products here, when data is guaranteed to be loaded
+    suggestedProducts = window.catalogProducts
+      .filter((p) => p.id !== product.id && p.brand === product.brand)
+      .slice(0, 8);
+
     const slider = document.getElementById("suggested-slider");
     if (!slider || suggestedProducts.length === 0) {
       document.getElementById("suggested-prev").style.display = "none";

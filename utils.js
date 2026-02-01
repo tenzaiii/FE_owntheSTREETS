@@ -1,4 +1,4 @@
-// owntheSTREETS - Utility Functions
+// (No content here, switching to view login.html first)
 // Handles Authentication (Supabase), Cart (localStorage), and Favorites (Supabase)
 
 const STORAGE_KEYS = {
@@ -158,6 +158,7 @@ const Favorites = {
                 .eq('user_id', user.id)
                 .eq('product_id', productId);
 
+            if (error) console.error('Error removing favorite:', error);
             return !error;
         } else {
             // Add favorite
@@ -165,6 +166,7 @@ const Favorites = {
                 .from('user_favorites')
                 .insert({ user_id: user.id, product_id: productId });
 
+            if (error) console.error('Error adding favorite:', error);
             return !error;
         }
     },

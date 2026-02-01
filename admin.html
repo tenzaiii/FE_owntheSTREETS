@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Admin Dashboard - owntheSTREETS</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- Tailwind & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* Custom scrollbar for dark theme */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        rounded: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #444;
+      }
+      .sidebar-link.active {
+        background-color: #262626;
+        border-right: 4px solid white;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-gray-100 flex h-screen overflow-hidden font-sans">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 flex flex-col border-r border-gray-800">
+      <div
+        class="h-16 flex items-center justify-center border-b border-gray-800"
+      >
+        <h1 class="text-xl font-black tracking-tighter">owntheSTREETS</h1>
+        <span class="ml-2 text-xs bg-white text-black px-1 rounded font-bold"
+          >ADMIN</span
+        >
+      </div>
+
+      <nav class="flex-1 overflow-y-auto py-4">
+        <ul class="space-y-1">
+          <li>
+            <button
+              class="sidebar-link active w-full flex items-center px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              data-tab="dashboard"
+            >
+              <i class="fas fa-chart-line w-6 text-center"></i>
+              <span class="ml-3 font-medium">Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button
+              class="sidebar-link w-full flex items-center px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              data-tab="orders"
+            >
+              <i class="fas fa-shopping-cart w-6 text-center"></i>
+              <span class="ml-3 font-medium">Orders</span>
+            </button>
+          </li>
+          <li>
+            <button
+              class="sidebar-link w-full flex items-center px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              data-tab="products"
+            >
+              <i class="fas fa-box-open w-6 text-center"></i>
+              <span class="ml-3 font-medium">Inventory</span>
+            </button>
+          </li>
+          <li>
+            <button
+              class="sidebar-link w-full flex items-center px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              data-tab="customers"
+            >
+              <i class="fas fa-users w-6 text-center"></i>
+              <span class="ml-3 font-medium">Customers</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="p-4 border-t border-gray-800">
+        <button
+          id="admin-logout"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 hover:bg-red-900 text-white rounded-lg transition-colors text-sm font-bold"
+        >
+          <i class="fas fa-sign-out-alt"></i> LOGOUT
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-black overflow-hidden relative">
+      <!-- Header -->
+      <header
+        class="h-16 flex items-center justify-between px-8 border-b border-gray-800 bg-black/50 backdrop-blur-sm z-10"
+      >
+        <h2 id="page-title" class="text-xl font-bold">Overview</h2>
+        <div class="flex items-center gap-4">
+          <div class="text-sm text-gray-400">admin@ownthestreets.com</div>
+          <div
+            class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center"
+          >
+            <i class="fas fa-user-shield text-xs"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div id="content-area" class="flex-1 overflow-y-auto p-8">
+        <!-- Content injected via JS -->
+        <div class="flex items-center justify-center h-full">
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Templates for Views -->
+    <template id="view-dashboard">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stat Cards -->
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase font-bold">
+                Total Revenue
+              </p>
+              <h3 class="text-2xl font-bold mt-1 text-white">₱124,500</h3>
+            </div>
+            <div class="p-2 bg-green-500/10 rounded-lg text-green-500">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+          <span class="text-xs text-green-500 flex items-center gap-1"
+            ><i class="fas fa-arrow-up"></i> +12.5% this month</span
+          >
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase font-bold">
+                Total Orders
+              </p>
+              <h3
+                class="text-2xl font-bold mt-1 text-white"
+                id="stat-orders-count"
+              >
+                0
+              </h3>
+            </div>
+            <div class="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+          </div>
+          <span class="text-xs text-gray-500">Processing orders</span>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase font-bold">
+                Total Customers
+              </p>
+              <h3
+                class="text-2xl font-bold mt-1 text-white"
+                id="stat-customers-count"
+              >
+                0
+              </h3>
+            </div>
+            <div class="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <span class="text-xs text-gray-500">Registered users</span>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase font-bold">Products</p>
+              <h3
+                class="text-2xl font-bold mt-1 text-white"
+                id="stat-products-count"
+              >
+                0
+              </h3>
+            </div>
+            <div class="p-2 bg-orange-500/10 rounded-lg text-orange-500">
+              <i class="fas fa-box"></i>
+            </div>
+          </div>
+          <span class="text-xs text-gray-500">Active inventory</span>
+        </div>
+      </div>
+
+      <!-- Recent Activity Table (Placeholder) -->
+      <div
+        class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden"
+      >
+        <div
+          class="p-6 border-b border-gray-800 flex justify-between items-center"
+        >
+          <h3 class="font-bold text-lg">Recent Orders</h3>
+          <button
+            class="text-sm text-gray-400 hover:text-white"
+            onclick="document.querySelector('[data-tab=orders]').click()"
+          >
+            View All
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead
+              class="bg-black/20 text-xs uppercase font-bold text-gray-500"
+            >
+              <tr>
+                <th class="px-6 py-4">Order ID</th>
+                <th class="px-6 py-4">Customer</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-gray-800"
+              id="dashboard-recent-orders"
+            >
+              <!-- Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <template id="view-orders">
+      <div
+        class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden h-full flex flex-col"
+      >
+        <div
+          class="p-6 border-b border-gray-800 flex justify-between items-center"
+        >
+          <div class="flex gap-4">
+            <input
+              type="text"
+              placeholder="Search orders..."
+              class="bg-black border border-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white"
+            />
+            <select
+              class="bg-black border border-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none"
+            >
+              <option>All Status</option>
+              <option>Pending</option>
+              <option>Processing</option>
+              <option>Shipped</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex-1 overflow-auto">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead
+              class="bg-black/20 text-xs uppercase font-bold text-gray-500 sticky top-0 bg-gray-900 z-10"
+            >
+              <tr>
+                <th class="px-6 py-4">Order ID</th>
+                <th class="px-6 py-4">Date</th>
+                <th class="px-6 py-4">Customer</th>
+                <th class="px-6 py-4">Items</th>
+                <th class="px-6 py-4">Total</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" id="orders-table-body">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <template id="view-products">
+      <div
+        class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden h-full flex flex-col"
+      >
+        <div
+          class="p-6 border-b border-gray-800 flex justify-between items-center"
+        >
+          <input
+            type="text"
+            placeholder="Search products..."
+            class="bg-black border border-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white w-64"
+          />
+          <a
+            href="migrate-products.html"
+            target="_blank"
+            class="px-4 py-2 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <i class="fas fa-plus mr-2"></i> Add Product
+          </a>
+        </div>
+        <div class="flex-1 overflow-auto">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead
+              class="bg-black/20 text-xs uppercase font-bold text-gray-500 sticky top-0 bg-gray-900 z-10"
+            >
+              <tr>
+                <th class="px-6 py-4">Image</th>
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Brand</th>
+                <th class="px-6 py-4">Category</th>
+                <th class="px-6 py-4">Price</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" id="products-table-body">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <template id="view-customers">
+      <div
+        class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden h-full flex flex-col"
+      >
+        <div class="p-6 border-b border-gray-800">
+          <h3 class="font-bold">Registered Customers</h3>
+        </div>
+        <div class="flex-1 overflow-auto">
+          <table class="w-full text-left text-sm text-gray-400">
+            <thead
+              class="bg-black/20 text-xs uppercase font-bold text-gray-500 sticky top-0 bg-gray-900 z-10"
+            >
+              <tr>
+                <th class="px-6 py-4">ID</th>
+                <th class="px-6 py-4">Email</th>
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Role</th>
+                <th class="px-6 py-4">Joined</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" id="customers-table-body">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <!-- Supabase & Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="utils.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

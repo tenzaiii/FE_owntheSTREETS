@@ -134,6 +134,38 @@
             </div>
           </div>
 
+          <!-- Password Strength -->
+          <div>
+            <div class="h-1 w-full bg-gray-800 rounded overflow-hidden">
+              <div
+                id="password-strength-bar"
+                class="h-full bg-red-500 w-0 transition-all duration-300"
+              ></div>
+            </div>
+            <p id="password-strength-text" class="text-xs text-gray-500 mt-1">
+              Password strength
+            </p>
+          </div>
+
+          <!-- Terms -->
+          <div class="flex items-center">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              required
+              class="h-4 w-4 text-white focus:ring-white border-gray-600 rounded bg-gray-900"
+            />
+            <label for="terms" class="ml-2 block text-sm text-gray-400">
+              I agree to the
+              <a href="#" class="text-white hover:underline"
+                >Terms of Service</a
+              >
+              and
+              <a href="#" class="text-white hover:underline">Privacy Policy</a>
+            </label>
+          </div>
+
           <div>
             <button
               type="submit"
@@ -173,6 +205,35 @@
     <script src="utils.js"></script>
     <script>
       document
+        .getElementById("password")
+        .addEventListener("input", function (e) {
+          const val = e.target.value;
+          const bar = document.getElementById("password-strength-bar");
+          const text = document.getElementById("password-strength-text");
+          let strength = 0;
+
+          if (val.length > 5) strength += 20;
+          if (val.length > 8) strength += 20;
+          if (/[A-Z]/.test(val)) strength += 20;
+          if (/[0-9]/.test(val)) strength += 20;
+          if (/[^A-Za-z0-9]/.test(val)) strength += 20;
+
+          bar.style.width = strength + "%";
+          if (strength < 40) {
+            bar.className = "h-full bg-red-500 w-0 transition-all duration-300";
+            text.textContent = "Weak";
+          } else if (strength < 80) {
+            bar.className =
+              "h-full bg-yellow-500 w-0 transition-all duration-300";
+            text.textContent = "Medium";
+          } else {
+            bar.className =
+              "h-full bg-green-500 w-0 transition-all duration-300";
+            text.textContent = "Strong";
+          }
+        });
+
+      document
         .getElementById("signup-form")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -181,6 +242,14 @@
           const password = document.getElementById("password").value;
           const confirmPassword =
             document.getElementById("confirm-password").value;
+          const terms = document.getElementById("terms").checked;
+
+          if (!terms) {
+            const errorEl = document.getElementById("signup-error");
+            errorEl.textContent = "You must agree to the Terms of Service.";
+            errorEl.classList.remove("hidden");
+            return;
+          }
 
           if (password !== confirmPassword) {
             const errorEl = document.getElementById("signup-error");

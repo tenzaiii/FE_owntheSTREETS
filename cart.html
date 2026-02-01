@@ -130,8 +130,24 @@
                 <span>Total</span>
                 <span id="cart-total">₱0.00</span>
               </div>
+              <div id="guest-checkout-container" class="hidden mb-4">
+                <label class="block text-xs uppercase text-gray-400 mb-2"
+                  >Contact Email</label
+                >
+                <input
+                  type="email"
+                  id="checkout-email"
+                  class="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white transition-colors"
+                  placeholder="email@example.com"
+                />
+                <p class="text-xs text-gray-500 mt-2">
+                  Required for order updates.
+                </p>
+              </div>
+
               <button
-                class="w-full py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors"
+                id="checkout-btn"
+                class="w-full py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 CHECKOUT
               </button>
@@ -230,6 +246,51 @@
                 window.location.reload();
               }
             });
+          });
+
+          // Checkout Logic
+          const checkoutBtn = document.getElementById("checkout-btn");
+          const guestContainer = document.getElementById(
+            "guest-checkout-container",
+          );
+          const emailInput = document.getElementById("checkout-email");
+
+          const checkAuth = async () => {
+            const user = await Auth.getCurrentUser();
+            if (!user) {
+              guestContainer.classList.remove("hidden");
+            } else {
+              guestContainer.classList.add("hidden");
+            }
+          };
+          checkAuth();
+
+          checkoutBtn.addEventListener("click", async () => {
+            const user = await Auth.getCurrentUser();
+            let email = "";
+
+            if (!user) {
+              email = emailInput.value.trim();
+              if (!email || !email.includes("@")) {
+                alert("Please enter a valid email address to checkout.");
+                emailInput.focus();
+                return;
+              }
+            } else {
+              email = user.email;
+            }
+
+            // Proceed to checkout (mockup)
+            checkoutBtn.textContent = "Processing...";
+            checkoutBtn.disabled = true;
+
+            setTimeout(() => {
+              alert(
+                `Order placed successfully!\nConfirmation sent to ${email}`,
+              );
+              Cart.clearCart();
+              window.location.href = "index.html";
+            }, 1500);
           });
         } else {
           itemsContainer.innerHTML = `

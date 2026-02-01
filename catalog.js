@@ -377,11 +377,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const brand = params.get('brand');
         if (brand) {
-            const input = document.querySelector(`input[data-filter-group="brand"][data-filter-value="${brand}"]`);
+            // Decode the URL encoded brand (e.g., "New%20Era" -> "New Era")
+            const decodedBrand = decodeURIComponent(brand);
+
+            // Since brand inputs are dynamic, they might not exist yet when this runs immediately.
+            // We set the state so applyFilters() respects it.
+            state.filters.brand = [decodedBrand];
+
+            // Try to check input if it already exists (unlikely on first load, but consistent)
+            const input = document.querySelector(`input[data-filter-group="brand"][data-filter-value="${decodedBrand}"]`);
             if (input) input.checked = true;
         }
 
-        syncFilterStateFromInputs();
+        // syncFilterStateFromInputs(); // Removed to avoid overwriting state we just set manually
     }
 
     // Event listeners
