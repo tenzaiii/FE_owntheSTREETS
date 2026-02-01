@@ -1,0 +1,97 @@
+-- Add images column if not exists
+ALTER TABLE products ADD COLUMN IF NOT EXISTS images TEXT[];
+
+-- Seed 80 Streetwear Items
+INSERT INTO products (id, name, brand, category, type, price, image_url, images, tag, sizes, description) VALUES
+
+-- CHROME HEARTS (15 items)
+('Chrome Hearts Floral Cross Horseshoe Hoodie Black', 'Chrome Hearts', 'Top', 'Apparel', 45000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png', 'IMG/CHRlogo.png'], 'Exclusive', ARRAY['S', 'M', 'L', 'XL'], 'Signature floral cross horseshoe design on premium heavyweight cotton.'),
+('Chrome Hearts Matty Boy Sex Records Hoodie Lime', 'Chrome Hearts', 'Top', 'Apparel', 52000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Limited', ARRAY['M', 'L', 'XL'], 'Rare Matty Boy collaboration piece featuring vibrant graphics.'),
+('Chrome Hearts Rolling Stones Lip & Tongue Tee', 'Chrome Hearts', 'Top', 'Apparel', 28000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Collab', ARRAY['S', 'M', 'L'], 'Official Rolling Stones collaboration tee with CH detailing.'),
+('Chrome Hearts Cross Patch Denim Jeans Blue', 'Chrome Hearts', 'Bottom', 'Apparel', 185000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Grail', ARRAY['30', '32', '34'], 'Vintage Levi''s reconstructed with sterling silver hardware and leather cross patches.'),
+('Chrome Hearts Fuck Trucker Hat Black/White', 'Chrome Hearts', 'Headwear', 'Cap', 22000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Iconic', ARRAY['One Size'], 'Classic tracker hat with bold embroidery.'),
+('Chrome Hearts Hollywood Trucker Hat Black', 'Chrome Hearts', 'Headwear', 'Cap', 22000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Bestseller', ARRAY['One Size'], 'Hollywood trucker featuring silver top button.'),
+('Chrome Hearts Dagger Zip Hoodie Grey', 'Chrome Hearts', 'Top', 'Apparel', 42000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Essential', ARRAY['S', 'M', 'L', 'XL'], 'Thermal lined hoodie with sterling silver dagger zipper pull.'),
+('Chrome Hearts Multi Color Cross Cemetery T-Shirt', 'Chrome Hearts', 'Top', 'Apparel', 25000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'New', ARRAY['M', 'L', 'XL'], 'Vibrant cemetery cross print on back.'),
+('Chrome Hearts Paper Chain Bracelet Silver', 'Chrome Hearts', 'Accessory', 'Accessory', 65000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Jewelry', ARRAY['One Size'], 'Sterling silver paper chain link bracelet.'),
+('Chrome Hearts Forever Ring Silver', 'Chrome Hearts', 'Accessory', 'Accessory', 35000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Jewelry', ARRAY['6', '7', '8', '9'], 'Classic "Forever" spacer ring.'),
+('Chrome Hearts Vertical Logo Socks (3 Pack)', 'Chrome Hearts', 'Accessory', 'Accessory', 12000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Essential', ARRAY['M', 'L'], 'Premium cotton socks with vertical logo.'),
+('Chrome Hearts Plus Cross Fancy Link Keyring', 'Chrome Hearts', 'Accessory', 'Accessory', 55000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Accessory', ARRAY['One Size'], 'Sterling silver keyring with fancy links.'),
+('Chrome Hearts Horseshoe Floral Pullover Black', 'Chrome Hearts', 'Top', 'Apparel', 46000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Restock', ARRAY['S', 'M', 'L', 'XL'], 'The classic horseshoe design everyone wants.'),
+('Chrome Hearts Red Cross Trucker Hat', 'Chrome Hearts', 'Headwear', 'Cap', 24000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'New', ARRAY['One Size'], 'Red cross patch variant.'),
+('Chrome Hearts Sweatpants with Logo Trim', 'Chrome Hearts', 'Bottom', 'Apparel', 38000, 'IMG/CHRlogo.png', ARRAY['IMG/CHRlogo.png'], 'Comfort', ARRAY['S', 'M', 'L'], 'Relaxed fit sweatpants with side logo taping.'),
+
+-- A BATHING APE (13 items)
+('BAPE Color Camo Shark Full Zip Hoodie Red', 'A Bathing Ape', 'Top', 'Apparel', 32000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Iconic', ARRAY['M', 'L', 'XL', 'XXL'], 'The legendary full zip shark hoodie in red camo.'),
+('BAPE abc Camo College Tee White/Green', 'A Bathing Ape', 'Top', 'Apparel', 8500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Bestseller', ARRAY['S', 'M', 'L', 'XL'], 'Classic college logo with green ABC camo.'),
+('BAPE 1st Camo Sweat Shorts Yellow', 'A Bathing Ape', 'Bottom', 'Apparel', 16000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Summer', ARRAY['M', 'L', 'XL'], 'Comfortable sweat shorts in yellow 1st camo.'),
+('BAPE Shark Wide Fit Tee Black', 'A Bathing Ape', 'Top', 'Apparel', 9500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'New', ARRAY['M', 'L', 'XL'], 'Oversized tee featuring shark face graphic.'),
+('BAPE Color Camo Relaxed Fit Crewneck Purple', 'A Bathing Ape', 'Top', 'Apparel', 18000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'New', ARRAY['L', 'XL'], 'Relaxed crewneck in purple camouflage.'),
+('BAPE Sta #2 M1 Sneakers White/Black', 'A Bathing Ape', 'Accessory', 'Footwear', 22000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Footwear', ARRAY['8', '9', '10', '11'], 'BAPE Sta low top sneakers.'),
+('BAPE Camo Shark Mask', 'A Bathing Ape', 'Accessory', 'Accessory', 4500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Accessory', ARRAY['One Size'], 'Fashion face mask with shark print.'),
+('BAPE 1st Camo Cargo Pants Green', 'A Bathing Ape', 'Bottom', 'Apparel', 24000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Utility', ARRAY['M', 'L', 'XL'], 'Rugged cargo pants in green 1st camo.'),
+('BAPE Baby Milo Tee White', 'A Bathing Ape', 'Top', 'Apparel', 7500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Cute', ARRAY['S', 'M', 'L'], 'Featuring the iconic Baby Milo character.'),
+('BAPE Point 1st Camo Socks', 'A Bathing Ape', 'Accessory', 'Accessory', 2500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Essential', ARRAY['One Size'], 'Camo print socks.'),
+('BAPE Shark Snowboard Jacket Black', 'A Bathing Ape', 'Top', 'Apparel', 48000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Winter', ARRAY['L', 'XL'], 'Heavyweight snowboard jacket with shark hood.'),
+('BAPE City Camo Ape Head Tee', 'A Bathing Ape', 'Top', 'Apparel', 8500, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Glow in Dark', ARRAY['M', 'L', 'XL'], 'City camo print that glows in the dark.'),
+('BAPE Double Shark Hoodie Navy', 'A Bathing Ape', 'Top', 'Apparel', 34000, 'IMG/BAPElogo.png', ARRAY['IMG/BAPElogo.png'], 'Rare', ARRAY['M', 'L', 'XL'], 'Double hood design with shark motif.'),
+
+-- HUMAN MADE (13 items)
+('Human Made Duck T-Shirt White', 'Human Made', 'Top', 'Apparel', 7000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Bestseller', ARRAY['S', 'M', 'L', 'XL'], 'Signature duck graphic on slub cotton tee.'),
+('Human Made Heart Logo Hoodie Grey', 'Human Made', 'Top', 'Apparel', 18000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Comfort', ARRAY['M', 'L', 'XL'], 'Soft fleece hoodie with red heart logo.'),
+('Human Made Girls Don''t Cry Varsity Jacket', 'Human Made', 'Top', 'Apparel', 65000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Grail', ARRAY['L', 'XL'], 'Wool body leather sleeve varsity jacket.'),
+('Human Made 6 Panel Twill Cap Navy', 'Human Made', 'Headwear', 'Cap', 6500, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'New', ARRAY['One Size'], 'Classic 6 panel dad hat.'),
+('Human Made Polar Bear T-Shirt Black', 'Human Made', 'Top', 'Apparel', 7000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Graphic', ARRAY['S', 'M', 'L', 'XL'], 'Vintage style polar bear print.'),
+('Human Made Military Chino Pants Khaki', 'Human Made', 'Bottom', 'Apparel', 21000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Essential', ARRAY['30', '32', '34'], 'Relaxed fit military inspired chinos.'),
+('Human Made Container 50L Olive', 'Human Made', 'Accessory', 'Home', 8500, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Lifestyle', ARRAY['One Size'], 'Foldable storage container for home.'),
+('Human Made Tiger Rug Small', 'Human Made', 'Accessory', 'Home', 12000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Lifestyle', ARRAY['One Size'], 'Hand tufted tiger shaped rug.'),
+('Human Made Heart Tote Bag', 'Human Made', 'Accessory', 'Bag', 9500, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Accessory', ARRAY['One Size'], 'Canvas tote with heart graphic.'),
+('Human Made Pizza Hoodie White', 'Human Made', 'Top', 'Apparel', 19000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Fun', ARRAY['M', 'L', 'XL'], 'Playful pizza delivery graphic.'),
+('Human Made Flight Jacket Green', 'Human Made', 'Top', 'Apparel', 45000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Outerwear', ARRAY['M', 'L', 'XL'], 'Nylon flight jacket with patches.'),
+('Human Made 3-Pack T-Shirts', 'Human Made', 'Top', 'Apparel', 6000, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Basic', ARRAY['S', 'M', 'L', 'XL'], 'Pack of 3 plain tees with small hem logo.'),
+('Human Made Curry Up Cap', 'Human Made', 'Headwear', 'Cap', 6500, 'IMG/HMlogo.png', ARRAY['IMG/HMlogo.png'], 'Collab', ARRAY['One Size'], 'Curry Up restaurant collaboration cap.'),
+
+-- CARHARTT WIP (13 items)
+('Carhartt WIP Detroit Jacket Hamilton Brown', 'Carhartt', 'Top', 'Apparel', 12500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Iconic', ARRAY['S', 'M', 'L', 'XL'], 'The definitive workwear jacket.'),
+('Carhartt WIP Double Knee Pant Black', 'Carhartt', 'Bottom', 'Apparel', 8500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Trending', ARRAY['30', '32', '34', '36'], 'Durable canvas pants with knee reinforcement.'),
+('Carhartt WIP Pocket T-Shirt White', 'Carhartt', 'Top', 'Apparel', 3500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Basic', ARRAY['S', 'M', 'L', 'XL', 'XXL'], 'Heavyweight cotton pocket tee.'),
+('Carhartt WIP Michigan Coat Blue Ridge', 'Carhartt', 'Top', 'Apparel', 11000, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Outerwear', ARRAY['M', 'L', 'XL'], 'Unlined chore coat in denim.'),
+('Carhartt WIP Acrylic Watch Hat Orange', 'Carhartt', 'Headwear', 'Cap', 1500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Essential', ARRAY['One Size'], 'Bright orange beanie.'),
+('Carhartt WIP Kickflip Backpack Black', 'Carhartt', 'Accessory', 'Bag', 6500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Travel', ARRAY['One Size'], 'Skate backpack with board straps.'),
+('Carhartt WIP Vest Black', 'Carhartt', 'Top', 'Apparel', 9500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Layering', ARRAY['M', 'L', 'XL'], 'Insulated canvas vest.'),
+('Carhartt WIP Aviation Pant Camo', 'Carhartt', 'Bottom', 'Apparel', 9000, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Utility', ARRAY['30', '32', '34'], 'Slim fit cargo pants.'),
+('Carhartt WIP American Script Sweatshirt Grey', 'Carhartt', 'Top', 'Apparel', 7500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Comfort', ARRAY['S', 'M', 'L', 'XL'], 'Loopback cotton jersey sweatshirt.'),
+('Carhartt WIP Bib Overall Brown', 'Carhartt', 'Bottom', 'Apparel', 13000, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Workwear', ARRAY['30x32', '32x32', '34x32'], 'Classic Dearborn canvas overalls.'),
+('Carhartt WIP Nimbus Pullover Jacket', 'Carhartt', 'Top', 'Apparel', 10500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Weather', ARRAY['M', 'L', 'XL'], 'Water repellent pullover windbreaker.'),
+('Carhartt WIP Script Bucket Hat', 'Carhartt', 'Headwear', 'Cap', 3000, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Accessory', ARRAY['M', 'L'], 'Canvas bucket hat.'),
+('Carhartt WIP Sid Pant Navy', 'Carhartt', 'Bottom', 'Apparel', 7500, 'IMG/CRTlogo.png', ARRAY['IMG/CRTlogo.png'], 'Casual', ARRAY['30', '32', '34'], 'Chino style fitted pant.'),
+
+-- STUSSY (13 items)
+('Stussy 8 Ball Tee Black', 'Stussy', 'Top', 'Apparel', 4500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Iconic', ARRAY['S', 'M', 'L', 'XL'], 'Classic 8 ball graphic back print.'),
+('Stussy Basic Stussy Hoodie Ash Heather', 'Stussy', 'Top', 'Apparel', 8500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Essential', ARRAY['M', 'L', 'XL'], 'Shawn Stussy signature logo hoodie.'),
+('Stussy Big Ol Jeans Blue', 'Stussy', 'Bottom', 'Apparel', 11000, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Trending', ARRAY['30', '32', '34'], 'Baggy fit denim jeans.'),
+('Stussy Stock Cuff Beanie Black', 'Stussy', 'Headwear', 'Cap', 2500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Winter', ARRAY['One Size'], 'Embroidered stock logo beanie.'),
+('Stussy Dragon Sherpa Jacket', 'Stussy', 'Top', 'Apparel', 14000, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Statement', ARRAY['M', 'L', 'XL'], 'Jacquard sherpa fleece with dragon pattern.'),
+('Stussy Dice Tee White', 'Stussy', 'Top', 'Apparel', 4500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Graphic', ARRAY['M', 'L', 'XL'], 'Fuzzy dice graphic tee.'),
+('Stussy Water Short Black', 'Stussy', 'Bottom', 'Apparel', 6500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Summer', ARRAY['S', 'M', 'L', 'XL'], 'Nylon swim shorts.'),
+('Stussy Smooth Stock Coach Jacket', 'Stussy', 'Top', 'Apparel', 9500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Outerwear', ARRAY['M', 'L', 'XL'], 'Classic nylon coaches jacket.'),
+('Stussy Low Pro Cap Green', 'Stussy', 'Headwear', 'Cap', 3000, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Accessory', ARRAY['One Size'], 'Unstructured 6 panel cap.'),
+('Stussy Plaid Flannel Shirt', 'Stussy', 'Top', 'Apparel', 9000, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Layering', ARRAY['M', 'L', 'XL'], 'Shadow plaid button up.'),
+('Stussy Knit Bucket Hat', 'Stussy', 'Headwear', 'Cap', 3500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'New', ARRAY['One Size'], 'Acrylic knit bucket hat.'),
+('Stussy Dyed Nylon Bomber', 'Stussy', 'Top', 'Apparel', 16000, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Premium', ARRAY['L', 'XL'], 'Garment dyed nylon bomber jacket.'),
+('Stussy World Tour Tee White', 'Stussy', 'Top', 'Apparel', 4500, 'IMG/STSlogo.jpg', ARRAY['IMG/STSlogo.jpg'], 'Classic', ARRAY['S', 'M', 'L', 'XL'], 'Cities list graphic.'),
+
+-- ESSENTIALS (13 items)
+('Essentials Fear of God Hoodie Black', 'Essentials', 'Top', 'Apparel', 11000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Bestseller', ARRAY['XXS', 'XS', 'S', 'M', 'L', 'XL'], 'Rubberized logo applique hoodie.'),
+('Essentials Fear of God Sweatpants Concrete', 'Essentials', 'Bottom', 'Apparel', 10000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Comfort', ARRAY['S', 'M', 'L'], 'Relaxed tapered sweatpants.'),
+('Essentials Fear of God T-Shirt Cream', 'Essentials', 'Top', 'Apparel', 6500, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Basic', ARRAY['S', 'M', 'L', 'XL'], 'Boxy fit cotton jersey tee.'),
+('Essentials Fear of God Coach Jacket', 'Essentials', 'Top', 'Apparel', 13000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Outerwear', ARRAY['M', 'L', 'XL'], 'Nylon light jacket with back logo.'),
+('Essentials Fear of God Knit Hoodie Harvest', 'Essentials', 'Top', 'Apparel', 14000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Winter', ARRAY['M', 'L'], 'Heavyweight knit construction.'),
+('Essentials Fear of God Mock Neck Sweatshirt', 'Essentials', 'Top', 'Apparel', 9500, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'New', ARRAY['S', 'M', 'L', 'XL'], 'Mock neck pullover.'),
+('Essentials Fear of God Volley Short', 'Essentials', 'Bottom', 'Apparel', 7500, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Summer', ARRAY['S', 'M', 'L'], 'Nylon iridescent shorts.'),
+('Essentials Fear of God Tennis Low Sneaker', 'Essentials', 'Accessory', 'Footwear', 21000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Footwear', ARRAY['41', '42', '43', '44'], 'Minimalist leather sneaker.'),
+('Essentials Fear of God Long Sleeve Polo', 'Essentials', 'Top', 'Apparel', 8500, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Classy', ARRAY['M', 'L', 'XL'], 'Cotton polo with flock logo.'),
+('Essentials Fear of God Puffer Jacket', 'Essentials', 'Top', 'Apparel', 24000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Winter', ARRAY['M', 'L', 'XL'], 'Insulated puffer jacket.'),
+('Essentials Fear of God Running Short', 'Essentials', 'Bottom', 'Apparel', 6500, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Active', ARRAY['S', 'M', 'L'], 'Curved hem athletic short.'),
+('Essentials Fear of God Cable Knit Turtle Neck', 'Essentials', 'Top', 'Apparel', 15000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Cozy', ARRAY['S', 'M', 'L'], 'Thick cable knit sweater.'),
+('Essentials Fear of God 1977 Tee', 'Essentials', 'Top', 'Apparel', 7000, 'IMG/ESNlogo.png', ARRAY['IMG/ESNlogo.png'], 'Iconic', ARRAY['S', 'M', 'L', 'XL'], 'Flocked 1977 chest graphic.');

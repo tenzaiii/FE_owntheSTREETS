@@ -364,15 +364,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const search = params.get('search');
-        if (search) {
-            state.search = search;
-            if (searchInput) searchInput.value = search;
+        if (params.get('search')) {
+            const query = decodeURIComponent(params.get('search'));
+            if (searchInput) searchInput.value = query;
+            state.search = query; // Assuming state.search is the correct property
         }
 
         const category = params.get('category');
         if (category) {
             const input = document.querySelector(`input[data-filter-group="category"][data-filter-value="${category}"]`);
             if (input) input.checked = true;
+        }
+
+        if (params.get('price')) {
+            const price = params.get('price');
+            const radio = document.querySelector(`input[name="price-filter"][data-filter-value="${price}"]`);
+            if (radio) radio.checked = true;
+            state.filters.price = [price]; // Ensure it's an array for consistency with other filters
         }
 
         const brand = params.get('brand');

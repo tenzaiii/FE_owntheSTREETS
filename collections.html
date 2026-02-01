@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Collections - owntheSTREETS</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav
+      id="navbar"
+      class="sticky top-0 z-50 bg-black text-white transition-all duration-300"
+    >
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between gap-3 py-3 sm:py-4">
+          <div class="flex items-center min-w-0">
+            <a
+              href="index.html"
+              class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight truncate"
+            >
+              owntheSTREETS
+            </a>
+          </div>
+
+          <div class="hidden lg:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="hover:text-gray-300 transition font-medium"
+              >HOME</a
+            >
+            <a
+              href="catalog.html"
+              class="hover:text-gray-300 transition font-medium"
+              >CATALOG</a
+            >
+            <a
+              href="#"
+              class="text-white font-bold underline underline-offset-4"
+              >COLLECTIONS</a
+            >
+            <a
+              href="catalog.html?tag=New"
+              class="hover:text-gray-300 transition font-medium"
+              >ARRIVALS</a
+            >
+          </div>
+
+          <div class="flex items-center space-x-6">
+            <a
+              href="login.html"
+              class="nav-user-link hover:text-gray-300 transition"
+            >
+              <i class="fas fa-user text-lg"></i>
+            </a>
+            <a
+              href="profile.html#cart"
+              class="hover:text-gray-300 transition relative"
+            >
+              <i class="fas fa-shopping-bag text-lg"></i>
+              <span
+                class="cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden"
+                >0</span
+              >
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header -->
+    <header
+      class="py-16 md:py-24 px-4 text-center border-b border-gray-800 bg-gradient-to-b from-gray-900 to-black"
+    >
+      <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-4">
+        CURATED COLLECTIONS
+      </h1>
+      <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+        Explore the finest selection from the world's leading streetwear brands.
+      </p>
+    </header>
+
+    <!-- Collections Container -->
+    <main
+      class="container mx-auto px-4 py-12 space-y-20"
+      id="collections-container"
+    >
+      <!-- Content injected by JS -->
+      <div class="text-center text-gray-500 py-12">Loading collections...</div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-16 border-t border-gray-800">
+      <div class="container mx-auto px-4 text-center">
+        <p class="text-gray-500">© 2024 owntheSTREETS Co., LLC.</p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="products-loader.js"></script>
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+      document.addEventListener("productsLoaded", () => {
+        const container = document.getElementById("collections-container");
+        const products = window.catalogProducts || [];
+
+        // Group by Brand
+        const brands = {};
+        products.forEach((p) => {
+          if (!brands[p.brand]) brands[p.brand] = [];
+          brands[p.brand].push(p);
+        });
+
+        // Sort brands alphabetically
+        const sortedBrands = Object.keys(brands).sort();
+
+        container.innerHTML = "";
+
+        if (sortedBrands.length === 0) {
+          container.innerHTML =
+            '<div class="text-center text-gray-500">No collections found.</div>';
+          return;
+        }
+
+        sortedBrands.forEach((brand) => {
+          const items = brands[brand].slice(0, 4); // Preview 4 items
+
+          const section = document.createElement("section");
+          section.className = "collection-block";
+
+          let itemsHTML = items
+            .map(
+              (p) => `
+                    <a href="product.html?id=${p.id}" class="group block bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:border-white/50 transition-colors">
+                        <div class="aspect-square bg-gray-900 overflow-hidden relative">
+                             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-sm truncate">${p.name}</h3>
+                            <p class="text-gray-400 text-xs mt-1">₱${p.price.toLocaleString("en-PH")}</p>
+                        </div>
+                    </a>
+                `,
+            )
+            .join("");
+
+          section.innerHTML = `
+                    <div class="flex items-end justify-between mb-6 border-b border-gray-800 pb-4">
+                        <div>
+                            <h2 class="text-3xl font-bold tracking-tight">${brand}</h2>
+                            <p class="text-sm text-gray-400 mt-1">${brands[brand].length} items</p>
+                        </div>
+                        <a href="catalog.html?brand=${encodeURIComponent(brand)}" class="text-sm font-bold border border-white px-4 py-2 rounded-full hover:bg-white hover:text-black transition-colors">
+                            VIEW ALL
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${itemsHTML}
+                    </div>
+                `;
+
+          container.appendChild(section);
+        });
+      });
+
+      // Trigger generic load interaction if products already ready
+      if (window.productsLoaded) {
+        window.dispatchEvent(new Event("productsLoaded"));
+      }
+    </script>
+  </body>
+</html>

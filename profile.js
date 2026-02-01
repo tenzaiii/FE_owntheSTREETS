@@ -317,12 +317,74 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Checkout Btn
     const checkoutBtn = document.getElementById('cart-tab-checkout-btn');
     if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            alert("Proceeding to checkout...");
-            // Mock checkout logic or redirect
-            Cart.clearCart();
-            renderCartTab();
-            window.location.href = 'index.html';
+        checkoutBtn.addEventListener('click', async () => {
+            const cart = Cart.getCart();
+            if (cart.length === 0) {
+                alert("Your bag is empty.");
+                return;
+            }
+
+            const confirmCheckout = confirm("Ready to place your order?");
+            if (!confirmCheckout) return;
+
+            checkoutBtn.textContent = "Processing...";
+            checkoutBtn.disabled = true;
+
+            const supabase = getSupabase();
+            const user = await Auth.getCurrentUser();
+
+            // Calculate Total
+            const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+            // 1. Create Order
+            const orderData = {
+                user_id: user ? user.id : null, // Support guest if we allow it, but profile.js requires login currently
+                total_amount: totalAmount,
+                status: 'pending',
+                guest_email: user ? user.email : null // Use verified email
+            };
+
+            try {
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .insert(orderData)
+                    .select()
+                    .single();
+
+                if (orderError) throw orderError;
+
+                // 2. Create Order Items
+                const orderItems = cart.map(item => ({
+                    order_id: order.id,
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    size: item.selectedSize || "OS",
+                    price_at_time: item.price,
+                    product_name: item.name
+                }));
+
+                const { error: itemsError } = await supabase
+                    .from('order_items')
+                    .insert(orderItems);
+
+                if (itemsError) throw itemsError;
+
+                // 3. Success
+                Cart.clearCart(); // Clear local cart
+                renderCartTab(); // Update UI
+
+                alert(`Order #${order.id} placed successfully! Thank you.`);
+
+                // Optional: Redirect to an "Orders" tab if we had one, or stay here.
+                // switchTab('orders'); 
+
+            } catch (err) {
+                console.error('Checkout Error:', err);
+                alert("Failed to place order. Please try again.");
+            } finally {
+                checkoutBtn.textContent = "CHECKOUT";
+                checkoutBtn.disabled = false;
+            }
         });
     }
 
