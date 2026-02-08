@@ -117,19 +117,33 @@ const Cart = {
 
     updateBadge() {
         const count = this.getTotalItems();
-        const badges = document.querySelectorAll('.cart-badge');
-        badges.forEach(badge => {
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'flex' : 'none';
-            // Remove or add hidden class if using Tailwind hidden logic, but inline style works for now as override
-            if (count > 0) {
-                badge.classList.remove('hidden');
-                badge.style.display = 'flex';
-            } else {
-                badge.classList.add('hidden');
-                badge.style.display = 'none';
-            }
-        });
+        // We use a slightly delayed check or event listener, but let's try to query immediately
+        // and also set up a listener for dynamic headers.
+
+        const updateUI = () => {
+            const badges = document.querySelectorAll('.cart-badge');
+            badges.forEach(badge => {
+                badge.textContent = count;
+                if (count > 0) {
+                    badge.classList.remove('hidden');
+                    badge.style.display = 'flex';
+                    // Fix offset
+                    badge.style.top = '-8px';
+                    badge.style.right = '-8px';
+                } else {
+                    badge.classList.add('hidden');
+                    badge.style.display = 'none';
+                }
+            });
+        };
+
+        updateUI();
+
+        // In case header isn't loaded yet
+        if (!window.headerListenerAttached) {
+            document.addEventListener('headerLoaded', updateUI);
+            window.headerListenerAttached = true;
+        }
     }
 };
 

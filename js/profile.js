@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Modal for Update Details
         const modalHTML = `
-            <div id="profile-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-                <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl w-full max-w-md relative">
+            <div id="profile-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+                <div class="bg-gray-900 border border-gray-800 p-6 md:p-8 rounded-2xl w-full max-w-md relative overflow-y-auto max-h-[90vh]">
                     <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                         <i class="fas fa-times text-xl"></i>
                     </button>
@@ -55,8 +55,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                     
                     <form id="profile-form" class="space-y-4">
                         <div>
-                            <label class="block text-xs uppercase text-gray-400 mb-2">Name</label>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Full Name</label>
                             <input type="text" id="edit-name" class="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white transition-colors" value="${user.user_metadata?.name || ''}">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Phone Number</label>
+                            <input type="tel" id="edit-phone" class="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white transition-colors" placeholder="0912 345 6789">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Shipping Address</label>
+                            <textarea id="edit-address" rows="3" class="w-full bg-black border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white transition-colors" placeholder="Unit, Street, City, Province, Zip Code"></textarea>
                         </div>
                         <button type="submit" class="w-full py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors">
                             SAVE CHANGES
@@ -74,7 +82,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         const form = document.getElementById('profile-form');
         const resetBtn = document.getElementById('reset-pwd-btn');
 
-        updateBtn.addEventListener('click', () => {
+        // Load existing profile data when opening modal
+        updateBtn.addEventListener('click', async () => {
+            const supabase = getSupabase();
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (profile) {
+                if (document.getElementById('edit-phone')) document.getElementById('edit-phone').value = profile.phone || '';
+                if (document.getElementById('edit-address')) document.getElementById('edit-address').value = profile.address || '';
+                // Name is usually in user_metadata, but we can sync it if needed.
+            }
+
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         });
@@ -87,6 +109,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newName = document.getElementById('edit-name').value;
+            const newPhone = document.getElementById('edit-phone').value;
+            const newAddress = document.getElementById('edit-address').value;
+
             const btn = form.querySelector('button');
             const originalText = btn.textContent;
 
@@ -94,21 +119,40 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.disabled = true;
 
             const supabase = getSupabase();
-            const { data, error } = await supabase.auth.updateUser({
-                data: { name: newName }
-            });
 
-            if (error) {
-                alert("Error updating profile: " + error.message);
-            } else {
+            try {
+                // 1. Update Auth Metadata (Name)
+                const { error: authError } = await supabase.auth.updateUser({
+                    data: { name: newName }
+                });
+                if (authError) throw authError;
+
+                // 2. Update Profiles Table (Phone, Address, Name)
+                // Use upsert to handle cases where the profile row doesn't exist yet (pre-trigger users)
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: user.id,
+                        email: user.email,
+                        full_name: newName,
+                        phone: newPhone,
+                        address: newAddress,
+                        role: 'customer' // Default role if creating new
+                    }, { onConflict: 'id' });
+
+                if (profileError) throw profileError;
+
                 alert("Profile updated successfully!");
                 if (profileName) profileName.textContent = newName;
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-            }
 
-            btn.textContent = originalText;
-            btn.disabled = false;
+            } catch (error) {
+                alert("Error updating profile: " + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
 
         resetBtn.addEventListener('click', async () => {
@@ -198,6 +242,178 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.addEventListener('productsLoaded', renderFavorites);
     }
 
+    // --- Orders Logic ---
+    let userOrders = [];
+
+    const fetchOrders = async () => {
+        const ordersList = document.getElementById('orders-list');
+        if (!ordersList) return;
+
+        ordersList.innerHTML = '<p class="text-gray-500 text-center py-10">Loading orders...</p>';
+
+        const supabase = getSupabase();
+
+        // Fetch orders and their items (removed nested products join to avoid potential errors)
+        const { data: orders, error } = await supabase
+            .from('orders')
+            .select(`
+                *,
+                order_items (
+                    id, product_id, product_name, quantity, size, price_at_time
+                )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching orders:', error);
+            ordersList.innerHTML = '<p class="text-red-500 text-center py-10">Failed to load orders.</p>';
+            return;
+        }
+
+        userOrders = orders || [];
+
+        // 2. Fetch images for products in these orders
+        const productIds = new Set();
+        userOrders.forEach(o => {
+            o.order_items.forEach(i => {
+                if (i.product_id) productIds.add(i.product_id);
+            });
+        });
+
+        if (productIds.size > 0) {
+            const { data: products } = await supabase
+                .from('products')
+                .select('id, image_url')
+                .in('id', Array.from(productIds));
+
+            // Map images to a lookup object
+            const imageMap = {};
+            if (products) {
+                products.forEach(p => {
+                    imageMap[p.id] = p.image_url;
+                });
+            }
+
+            // Attach images to userOrders items
+            userOrders.forEach(o => {
+                o.order_items.forEach(i => {
+                    i.image_url = imageMap[i.product_id];
+                });
+            });
+        }
+
+        renderOrders('all');
+    };
+
+    const renderOrders = (statusFilter) => {
+        const ordersList = document.getElementById('orders-list');
+        if (!ordersList) return;
+
+        let filtered = userOrders;
+        if (statusFilter !== 'all') {
+            filtered = userOrders.filter(o => o.status === statusFilter);
+        }
+
+        if (filtered.length === 0) {
+            ordersList.innerHTML = '<p class="text-gray-500 text-center py-10">No orders found.</p>';
+            return;
+        }
+
+        ordersList.innerHTML = filtered.map(order => {
+            // Calculate local status label color
+            let statusColor = 'text-gray-400';
+            let statusLabel = order.status.toUpperCase();
+
+            switch (order.status) {
+                case 'pending': statusColor = 'text-orange-500'; statusLabel = 'TO PAY'; break;
+                case 'processing': statusColor = 'text-blue-500'; statusLabel = 'TO SHIP'; break;
+                case 'shipped': statusColor = 'text-purple-500'; statusLabel = 'TO RECEIVE'; break;
+                case 'delivered': statusColor = 'text-green-500'; statusLabel = 'COMPLETED'; break;
+                case 'cancelled': statusColor = 'text-red-500'; break;
+            }
+
+            // Render items (first 2, then +more if needed)
+            const itemsHtml = order.order_items.map(item => {
+                const imgUrl = item.image_url || 'https://via.placeholder.com/150?text=No+Image'; // Fallback
+                return `
+                <div class="flex gap-4 py-2">
+                    <div class="w-16 h-16 bg-gray-900 rounded border border-gray-800 flex items-center justify-center overflow-hidden">
+                        <img src="${imgUrl}" alt="${item.product_name}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                         <h4 class="font-bold text-sm text-white line-clamp-1">${item.product_name}</h4>
+                         <p class="text-xs text-gray-500">Size: ${item.size} x${item.quantity}</p>
+                         <p class="text-xs text-gray-400">₱${item.price_at_time.toLocaleString("en-PH")}</p>
+                    </div>
+                </div>
+             `}).join('');
+
+            return `
+                <div class="bg-gray-950 border border-gray-800 rounded-xl p-4 sm:p-6 transition hover:border-gray-700">
+                    <div class="flex justify-between items-start mb-4 border-b border-gray-800 pb-4">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase font-bold">Order ID: #${order.id}</p>
+                            <p class="text-xs text-gray-600">${new Date(order.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <span class="text-xs font-bold ${statusColor} border border-current px-2 py-1 rounded">${statusLabel}</span>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        ${itemsHtml}
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-800">
+                        <div>
+                             <p class="text-xs text-gray-500">Total Amount</p>
+                             <p class="font-bold text-lg text-white">₱${order.total_amount.toLocaleString("en-PH")}</p>
+                        </div>
+                        <!-- Action Buttons based on status -->
+                         ${order.status === 'pending' ? `<button class="text-xs bg-white text-black px-4 py-2 rounded-full font-bold hover:bg-gray-200 transition">PAY NOW</button>` : ''}
+                         ${(order.status === 'pending' || order.status === 'processing') ? `<button class="text-xs border border-red-500 text-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-500 hover:text-white transition cancel-order-btn" data-id="${order.id}">CANCEL</button>` : ''}
+                    </div>
+                </div>
+             `;
+        }).join('');
+
+        // Attach Event Listeners
+        ordersList.querySelectorAll('.cancel-order-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const orderId = e.currentTarget.dataset.id; // Use currentTarget to ensure we get the button's data
+                if (!confirm(`Are you sure you want to cancel Order #${orderId}?`)) return;
+
+                const supabase = getSupabase();
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ status: 'cancelled' })
+                    .eq('id', orderId);
+
+                if (error) {
+                    alert("Failed to cancel order: " + error.message);
+                } else {
+                    alert("Order cancelled successfully.");
+                    fetchOrders(); // Refresh list
+                }
+            });
+        });
+    };
+
+    // Filter Tabs Logic
+    const statusTabs = document.querySelectorAll('.order-status-tab');
+    statusTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Active state
+            statusTabs.forEach(t => {
+                t.classList.remove('active', 'text-white', 'border-b-2', 'border-white');
+                t.classList.add('text-gray-500');
+            });
+            tab.classList.add('active', 'text-white', 'border-b-2', 'border-white');
+            tab.classList.remove('text-gray-500');
+
+            renderOrders(tab.dataset.status);
+        });
+    });
+
     // --- Tabs Logic ---
     const tabs = document.querySelectorAll('.profile-tab-btn');
     const views = document.querySelectorAll('.tab-content');
@@ -222,16 +438,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                 v.classList.add('hidden');
             }
         });
+
+        if (tabName === 'orders') {
+            fetchOrders();
+        } else if (tabName === 'cart') {
+            renderCartTab();
+        }
     };
 
     tabs.forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
-    // Check URL hash for initial tab
-    if (window.location.hash === '#cart') {
-        switchTab('cart');
-    }
+
+
 
     // --- Cart Rendering Logic ---
     const renderCartTab = () => {
@@ -314,9 +534,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Initial Render
     renderCartTab();
 
-    // Checkout Btn
+    // Checkout Btn & Modal Logic
     const checkoutBtn = document.getElementById('cart-tab-checkout-btn');
-    if (checkoutBtn) {
+    const checkoutModal = document.getElementById('checkout-modal');
+    const closeCheckout = document.getElementById('close-checkout');
+    const checkoutForm = document.getElementById('checkout-form');
+
+    // Store profile data for checkout
+    let currentProfile = null;
+
+    if (checkoutBtn && checkoutModal) {
+        // Open Modal
         checkoutBtn.addEventListener('click', async () => {
             const cart = Cart.getCart();
             if (cart.length === 0) {
@@ -324,27 +552,119 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
 
-            const confirmCheckout = confirm("Ready to place your order?");
-            if (!confirmCheckout) return;
+            // Calculate totals
+            const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            document.getElementById('checkout-subtotal').textContent = `₱${total.toLocaleString("en-PH")}.00`;
+            document.getElementById('checkout-total').textContent = `₱${total.toLocaleString("en-PH")}.00`;
 
-            checkoutBtn.textContent = "Processing...";
-            checkoutBtn.disabled = true;
+            checkoutModal.classList.remove('hidden');
+            checkoutModal.classList.add('flex');
+
+            // Fetch & Display Profile Data
+            const infoDiv = document.getElementById('checkout-profile-info');
+            const missingMsg = document.getElementById('checkout-missing-info');
+            const placeOrderBtn = document.getElementById('btn-place-order');
+
+            infoDiv.innerHTML = '<p class="italic text-gray-500">Loading details...</p>';
+            missingMsg.classList.add('hidden');
+            placeOrderBtn.disabled = true;
 
             const supabase = getSupabase();
             const user = await Auth.getCurrentUser();
 
-            // Calculate Total
-            const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            if (user) {
+                // Try to get profile
+                let { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
 
-            // 1. Create Order
-            const orderData = {
-                user_id: user ? user.id : null, // Support guest if we allow it, but profile.js requires login currently
-                total_amount: totalAmount,
-                status: 'pending',
-                guest_email: user ? user.email : null // Use verified email
-            };
+                // If profile doesn't exist (rare if trigger works), or just in case
+                if (!profile) {
+                    // Fallback using auth meta
+                    profile = { full_name: user.user_metadata?.name || user.email.split('@')[0], email: user.email };
+                }
+
+                currentProfile = profile; // Save for submit
+
+                if (profile && profile.address && profile.phone) {
+                    infoDiv.innerHTML = `
+                        <p class="font-bold text-white">${profile.full_name || user.email}</p>
+                        <p>${profile.phone}</p>
+                        <p class="opacity-80">${profile.address}</p>
+                    `;
+                    placeOrderBtn.disabled = false;
+                } else {
+                    infoDiv.innerHTML = `
+                        <p class="font-bold text-white">${profile?.full_name || user.email}</p>
+                        <p class="text-gray-500 italic">No address/phone saved.</p>
+                    `;
+                    missingMsg.classList.remove('hidden');
+                    placeOrderBtn.disabled = true;
+                }
+            }
+        });
+
+        // Close Modal
+        closeCheckout.addEventListener('click', () => {
+            checkoutModal.classList.add('hidden');
+            checkoutModal.classList.remove('flex');
+        });
+
+        // Edit Profile Link in Checkout
+        const editLink = document.getElementById('checkout-edit-profile');
+        if (editLink) {
+            editLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                checkoutModal.classList.add('hidden');
+                checkoutModal.classList.remove('flex');
+                document.getElementById('update-profile-btn').click(); // Trigger other modal
+            });
+        }
+
+        // Submit Order
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentProfile || !currentProfile.address || !currentProfile.phone) {
+                alert("Please update your profile with shipping details first.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-place-order');
+            const originalText = btn.textContent;
+            btn.textContent = "PROCESSING...";
+            btn.disabled = true;
 
             try {
+                const formData = new FormData(checkoutForm);
+                const cart = Cart.getCart();
+                const user = await Auth.getCurrentUser();
+                const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                const paymentMethod = formData.get('payment');
+
+                // Generate Random 14-digit Order ID
+                const orderId = Math.floor(Math.random() * 90000000000000) + 10000000000000;
+
+                const orderData = {
+                    id: orderId, // Manually set ID
+                    user_id: user.id,
+                    total_amount: totalAmount,
+                    // COD orders skip 'pending' (To Pay) and go straight to 'processing' (To Ship)
+                    status: paymentMethod === 'cod' ? 'processing' : 'pending',
+                    guest_email: user.email,
+                    shipping_address: currentProfile.address,
+                    contact_number: currentProfile.phone,
+                    payment_method: paymentMethod,
+                    guest_info: {
+                        name: currentProfile.full_name || user.user_metadata?.name
+                    }
+                };
+
+                const supabase = getSupabase();
+
+                // 1. Insert Order
                 const { data: order, error: orderError } = await supabase
                     .from('orders')
                     .insert(orderData)
@@ -353,7 +673,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (orderError) throw orderError;
 
-                // 2. Create Order Items
+                // 2. Insert Items
                 const orderItems = cart.map(item => ({
                     order_id: order.id,
                     product_id: item.id,
@@ -370,22 +690,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (itemsError) throw itemsError;
 
                 // 3. Success
-                Cart.clearCart(); // Clear local cart
-                renderCartTab(); // Update UI
+                Cart.clearCart();
+                renderCartTab();
 
-                alert(`Order #${order.id} placed successfully! Thank you.`);
+                checkoutModal.classList.add('hidden');
+                checkoutModal.classList.remove('flex');
+                checkoutForm.reset();
 
-                // Optional: Redirect to an "Orders" tab if we had one, or stay here.
-                // switchTab('orders'); 
+                alert(`Order #${order.id} placed successfully via ${paymentMethod.toUpperCase()}!`);
 
             } catch (err) {
-                console.error('Checkout Error:', err);
-                alert("Failed to place order. Please try again.");
+                console.error('Order Logic Error:', err);
+                alert("Failed to place order. " + err.message);
             } finally {
-                checkoutBtn.textContent = "CHECKOUT";
-                checkoutBtn.disabled = false;
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
         });
+    }
+
+    // Check URL hash for initial tab (Moved to end to ensure functions are defined)
+    if (window.location.hash === '#cart') {
+        switchTab('cart');
+    } else if (window.location.hash === '#orders') {
+        switchTab('orders');
     }
 
 });

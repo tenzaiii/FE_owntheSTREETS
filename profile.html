@@ -123,6 +123,12 @@
                 </button>
                 <button
                   class="profile-tab-btn w-full py-2 px-4 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center gap-3"
+                  data-tab="orders"
+                >
+                  <i class="fas fa-box w-5 text-center"></i> My Orders
+                </button>
+                <button
+                  class="profile-tab-btn w-full py-2 px-4 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center gap-3"
                   data-tab="cart"
                 >
                   <i class="fas fa-shopping-bag w-5 text-center"></i> My Bag
@@ -168,6 +174,63 @@
               </div>
             </div>
 
+            <!-- View: Orders -->
+            <div
+              id="view-orders"
+              class="tab-content hidden transition-opacity duration-300"
+            >
+              <h2 class="text-2xl font-bold mb-6 pb-4 border-b border-gray-800">
+                MY ORDERS
+              </h2>
+
+              <!-- Status Tabs -->
+              <div
+                class="flex overflow-x-auto gap-4 mb-6 border-b border-gray-800 pb-2 scrollbar-hide"
+              >
+                <button
+                  class="order-status-tab active whitespace-nowrap px-4 py-2 text-sm font-bold text-white border-b-2 border-white transition-colors"
+                  data-status="all"
+                >
+                  All
+                </button>
+                <button
+                  class="order-status-tab whitespace-nowrap px-4 py-2 text-sm font-bold text-gray-500 hover:text-white transition-colors"
+                  data-status="pending"
+                >
+                  To Pay
+                </button>
+                <button
+                  class="order-status-tab whitespace-nowrap px-4 py-2 text-sm font-bold text-gray-500 hover:text-white transition-colors"
+                  data-status="processing"
+                >
+                  To Ship
+                </button>
+                <button
+                  class="order-status-tab whitespace-nowrap px-4 py-2 text-sm font-bold text-gray-500 hover:text-white transition-colors"
+                  data-status="shipped"
+                >
+                  To Receive
+                </button>
+                <button
+                  class="order-status-tab whitespace-nowrap px-4 py-2 text-sm font-bold text-gray-500 hover:text-white transition-colors"
+                  data-status="delivered"
+                >
+                  Completed
+                </button>
+                <button
+                  class="order-status-tab whitespace-nowrap px-4 py-2 text-sm font-bold text-gray-500 hover:text-white transition-colors"
+                  data-status="cancelled"
+                >
+                  Cancelled
+                </button>
+              </div>
+
+              <!-- Orders List -->
+              <div id="orders-list" class="space-y-4">
+                <p class="text-gray-500 text-center py-10">Loading orders...</p>
+              </div>
+            </div>
+
             <!-- View: Cart -->
             <div
               id="view-cart"
@@ -191,13 +254,26 @@
                   <div
                     class="bg-gray-950 rounded-xl p-4 border border-gray-800"
                   >
-                    <div class="space-y-2 mb-4 text-sm text-gray-400">
-                      <div class="flex justify-between">
-                        <span>Subtotal</span>
-                        <span id="cart-tab-subtotal">₱0.00</span>
+                    <div class="space-y-4 mb-6">
+                      <h3
+                        class="text-sm font-bold uppercase tracking-widest text-white border-b border-gray-800 pb-2"
+                      >
+                        Order Summary
+                      </h3>
+                      <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex justify-between">
+                          <span>Subtotal</span>
+                          <span id="cart-tab-subtotal">₱0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Shipping</span>
+                          <span class="text-green-500 font-bold">FREE</span>
+                        </div>
                       </div>
                     </div>
-                    <div class="flex justify-between text-lg font-bold mb-4">
+                    <div
+                      class="flex justify-between text-xl font-bold mb-6 text-white pt-4 border-t border-gray-800"
+                    >
                       <span>Total</span> <span id="cart-tab-total">₱0.00</span>
                     </div>
                     <button
@@ -227,6 +303,143 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/products-loader.js"></script>
     <script src="js/utils.js"></script>
+    <!-- Checkout Modal -->
+    <div
+      id="checkout-modal"
+      class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[60] p-4"
+    >
+      <div
+        class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg relative flex flex-col max-h-[90vh]"
+      >
+        <div
+          class="p-6 border-b border-gray-800 flex justify-between items-center"
+        >
+          <h3 class="text-2xl font-bold text-white">Checkout</h3>
+          <button id="close-checkout" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto custom-scrollbar">
+          <form id="checkout-form" class="space-y-6">
+            <div class="space-y-6">
+              <!-- Delivery Details (Read Only) -->
+              <div class="bg-gray-950 p-4 rounded-lg border border-gray-800">
+                <div class="flex justify-between items-start mb-2">
+                  <h4
+                    class="text-sm uppercase text-gray-500 font-bold tracking-wider"
+                  >
+                    Delivery Details
+                  </h4>
+                  <a
+                    href="#"
+                    id="checkout-edit-profile"
+                    class="text-xs text-blue-500 hover:text-white underline"
+                    >Edit</a
+                  >
+                </div>
+                <div
+                  id="checkout-profile-info"
+                  class="text-sm text-gray-300 space-y-1"
+                >
+                  <p class="italic text-gray-500">Loading details...</p>
+                </div>
+                <p
+                  class="text-xs text-red-500 mt-2 hidden"
+                  id="checkout-missing-info"
+                >
+                  <i class="fas fa-exclamation-circle"></i> Please update your
+                  phone and address in your profile to proceed.
+                </p>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="space-y-4">
+                <h4
+                  class="text-sm uppercase text-gray-500 font-bold tracking-wider"
+                >
+                  Payment Method
+                </h4>
+                <div class="grid grid-cols-1 gap-3">
+                  <label class="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cod"
+                      class="peer sr-only"
+                      checked
+                    />
+                    <div
+                      class="border border-gray-700 rounded-lg p-4 flex items-center gap-4 peer-checked:border-white peer-checked:bg-white peer-checked:text-black hover:border-gray-500 transition-all"
+                    >
+                      <i
+                        class="fas fa-money-bill-wave text-xl w-8 text-center"
+                      ></i>
+                      <span class="font-bold text-sm">Cash on Delivery</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="gcash"
+                      class="peer sr-only"
+                    />
+                    <div
+                      class="border border-gray-700 rounded-lg p-4 flex items-center gap-4 peer-checked:border-white peer-checked:bg-white peer-checked:text-black hover:border-gray-500 transition-all"
+                    >
+                      <i class="fas fa-mobile-alt text-xl w-8 text-center"></i>
+                      <span class="font-bold text-sm">GCash</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="card"
+                      class="peer sr-only"
+                    />
+                    <div
+                      class="border border-gray-700 rounded-lg p-4 flex items-center gap-4 peer-checked:border-white peer-checked:bg-white peer-checked:text-black hover:border-gray-500 transition-all"
+                    >
+                      <i class="far fa-credit-card text-xl w-8 text-center"></i>
+                      <span class="font-bold text-sm">Credit / Debit Card</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary (Mini) -->
+            <div class="bg-gray-950 p-4 rounded-lg border border-gray-800">
+              <div class="flex justify-between text-gray-400 text-sm mb-2">
+                <span>Subtotal</span>
+                <span id="checkout-subtotal">₱0.00</span>
+              </div>
+              <div class="flex justify-between text-gray-400 text-sm mb-4">
+                <span>Shipping</span>
+                <span class="text-green-500">FREE</span>
+              </div>
+              <div
+                class="flex justify-between text-white font-bold text-lg border-t border-gray-800 pt-3"
+              >
+                <span>Total</span>
+                <span id="checkout-total">₱0.00</span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              id="btn-place-order"
+              class="w-full bg-white text-black font-bold py-4 rounded-full hover:bg-gray-200 transition-colors transform active:scale-95"
+            >
+              PLACE ORDER
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="js/profile.js"></script>
   </body>
 </html>

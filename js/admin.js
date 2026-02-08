@@ -14,6 +14,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pageTitle = document.getElementById("page-title");
     const tabs = document.querySelectorAll(".sidebar-link");
     const supabase = getSupabase();
+    let currentView = 'dashboard'; // Default
+
+    // Refresh Button
+    const btnRefresh = document.getElementById("btn-refresh");
+    if (btnRefresh) {
+        btnRefresh.addEventListener("click", () => {
+            // Add spin animation
+            const icon = btnRefresh.querySelector('i');
+            icon.classList.add('fa-spin');
+
+            // Reload view
+            renderView(currentView);
+
+            // Remove spin after short delay (or handle within renderView if it was async returning promise)
+            setTimeout(() => icon.classList.remove('fa-spin'), 1000);
+        });
+    }
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
@@ -34,6 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3. Render Functions
     function renderView(viewName) {
+        currentView = viewName; // Update state
         contentArea.innerHTML = ""; // Clear
         const template = document.getElementById(`view-${viewName}`);
         if (!template) return;
@@ -156,6 +174,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const modal = document.getElementById("modal-add-product");
         const btnCloseModal = document.getElementById("modal-close-btn");
         const formAdd = document.getElementById("form-add-product");
+        const modalTitle = document.getElementById("modal-product-title");
+        const btnSave = document.getElementById("btn-save-product");
 
         // --- FILTER LOGIC ---
         const fetchAndRender = async () => {
@@ -185,17 +205,27 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             tbody.innerHTML = products.map(p => `
-                <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${p.is_hidden ? 'opacity-50 grayscale' : ''}">
                     <td class="px-6 py-4">
-                        <div class="w-12 h-12 bg-gray-800 rounded overflow-hidden border border-gray-700">
+                        <div class="w-12 h-12 bg-gray-800 rounded overflow-hidden border border-gray-700 relative">
                             <img src="${p.image_url}" class="w-full h-full object-cover" onerror="this.src='IMG/esnlPlaceholder.jpg'">
+                            ${p.is_hidden ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><i class="fas fa-eye-slash text-white text-xs"></i></div>' : ''}
                         </div>
                     </td>
-                    <td class="px-6 py-4 font-bold text-white text-sm">${p.name}</td>
+                    <td class="px-6 py-4 font-bold text-white text-sm">
+                        ${p.name}
+                        ${p.is_hidden ? '<span class="ml-2 text-xs text-red-500 font-normal border border-red-500 px-1 rounded">HIDDEN</span>' : ''}
+                    </td>
                     <td class="px-6 py-4 text-xs uppercase text-gray-400">${p.brand}</td>
                     <td class="px-6 py-4 text-xs text-gray-400">${p.category}</td>
                     <td class="px-6 py-4 text-sm font-medium text-white">₱${p.price.toLocaleString()}</td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <button class="text-blue-500 hover:text-blue-400 p-2 rounded hover:bg-blue-500/10 transition edit-product-btn" data-id="${p.id}" title="Edit">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="text-yellow-500 hover:text-yellow-400 p-2 rounded hover:bg-yellow-500/10 transition toggle-visibility-btn" data-id="${p.id}" data-hidden="${p.is_hidden}" title="${p.is_hidden ? 'Show' : 'Hide'}">
+                            <i class="fas ${p.is_hidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                        </button>
                         <button class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/10 transition delete-product-btn" data-id="${p.id}" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -203,7 +233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </tr>
              `).join("");
 
-            // Re-bind delete
+            // Re-bind buttons
             document.querySelectorAll('.delete-product-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = btn.getAttribute('data-id');
@@ -217,6 +247,34 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 });
             });
+
+            document.querySelectorAll('.toggle-visibility-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = btn.getAttribute('data-id');
+                    const isHidden = btn.getAttribute('data-hidden') === 'true';
+                    const newStatus = !isHidden;
+
+                    // Optimistic update
+                    const icon = btn.querySelector('i');
+                    icon.className = `fas fa-spinner fa-spin`;
+
+                    const { error } = await supabase.from('products').update({ is_hidden: newStatus }).eq('id', id);
+                    if (error) {
+                        alert("Error updating visibility: " + error.message);
+                        fetchAndRender(); // Revert
+                    } else {
+                        fetchAndRender();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.edit-product-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-id');
+                    const product = products.find(p => p.id == id);
+                    if (product) openEditModal(product);
+                });
+            });
         };
 
         // Event Listeners for Filters
@@ -225,11 +283,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (filterCategory) filterCategory.addEventListener('change', fetchAndRender);
 
         // --- MODAL LOGIC ---
+        function openAddModal() {
+            formAdd.reset();
+            document.getElementById('product-id').value = ''; // Clear ID
+            modalTitle.textContent = "Add New Product";
+            btnSave.textContent = "ADD PRODUCT TO INVENTORY";
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function openEditModal(product) {
+            formAdd.reset();
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('input-name').value = product.name;
+            document.getElementById('input-price').value = product.price;
+            document.getElementById('input-brand').value = product.brand;
+            document.getElementById('input-category').value = product.category;
+            document.getElementById('input-type').value = product.type;
+            document.getElementById('input-image_url').value = product.image_url;
+            document.getElementById('input-tag').value = product.tag || "";
+
+            modalTitle.textContent = "Edit Product";
+            btnSave.textContent = "UPDATE PRODUCT";
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
         if (btnAdd) {
-            btnAdd.addEventListener('click', () => {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            });
+            btnAdd.addEventListener('click', openAddModal);
         }
 
         if (btnCloseModal) {
@@ -243,37 +324,53 @@ document.addEventListener("DOMContentLoaded", async () => {
             formAdd.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(formAdd);
-                const newProduct = {
+                const id = formData.get('id'); // Check if editing
+
+                const productData = {
                     name: formData.get('name'),
                     price: parseFloat(formData.get('price')),
                     brand: formData.get('brand'),
                     category: formData.get('category'),
-                    type: formData.get('type'), // Added type
+                    type: formData.get('type'),
                     image_url: formData.get('image_url'),
                     tag: formData.get('tag') || null,
-                    sizes: ["S", "M", "L", "XL"] // Default sizes for now
+                    // Persist sizes if editing, or default if new. 
+                    // Ideally we should have a sizes input, but for now we keep default.
                 };
 
-                const btn = formAdd.querySelector('button[type="submit"]');
-                const originalText = btn.textContent;
-                btn.textContent = "ADDING...";
-                btn.disabled = true;
+                if (!id) {
+                    productData.sizes = ["S", "M", "L", "XL"];
+                }
+
+                const originalText = btnSave.textContent;
+                btnSave.textContent = "SAVING...";
+                btnSave.disabled = true;
 
                 try {
-                    const { data, error } = await supabase.from('products').insert([newProduct]);
+                    let error;
+                    if (id) {
+                        // Update
+                        const res = await supabase.from('products').update(productData).eq('id', id);
+                        error = res.error;
+                    } else {
+                        // Insert
+                        const res = await supabase.from('products').insert([productData]);
+                        error = res.error;
+                    }
+
                     if (error) throw error;
 
-                    alert("Product added successfully!");
+                    alert(id ? "Product updated!" : "Product added!");
                     formAdd.reset();
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                    fetchAndRender(); // Update table
+                    fetchAndRender();
                 } catch (err) {
-                    alert("Error adding product: " + err.message);
+                    alert("Error saving product: " + err.message);
                     console.error(err);
                 } finally {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
+                    btnSave.textContent = originalText;
+                    btnSave.disabled = false;
                 }
             });
         }
