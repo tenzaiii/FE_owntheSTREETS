@@ -138,7 +138,19 @@
                     >0</span
                   >
                 </button>
+                </button>
               </nav>
+
+              <script>
+                 // Inline script to handle tab switching immediately on load if present
+                 document.addEventListener("DOMContentLoaded", () => {
+                     const hash = window.location.hash.replace('#', '');
+                     if (hash && ['orders', 'cart', 'profile'].includes(hash)) {
+                         // We rely on profile.js or a simple tab switcher here
+                         // But profile.js handles the main logic. Let's ensure profile.js picks it up.
+                     }
+                 });
+              </script>
 
               <button
                 id="logout-btn"

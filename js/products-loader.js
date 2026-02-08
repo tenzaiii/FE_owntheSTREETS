@@ -33,7 +33,8 @@ async function loadProducts() {
             price: product.price,
             tag: product.tag,
             image: product.image_url,
-            images: [product.image_url], // Can expand if multiple images stored
+            // Combine main image with additional images for the gallery
+            images: [product.image_url, ...(product.additional_images || [])],
             sizes: product.sizes || ['One Size'],
             description: product.description || ''
         }));
@@ -78,7 +79,7 @@ async function loadProductById(productId) {
             price: data.price,
             tag: data.tag,
             image: data.image_url,
-            images: [data.image_url],
+            images: [data.image_url, ...(data.additional_images || [])],
             sizes: data.sizes || ['One Size'],
             description: data.description || ''
         };

@@ -472,16 +472,58 @@
                   class="block text-xs uppercase text-gray-500 font-bold mb-2"
                   >Image URL</label
                 >
-                <input
-                  type="url"
-                  name="image_url"
-                  id="input-image_url"
-                  placeholder="https://..."
-                  required
-                  class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-white outline-none"
-                />
+                <div class="flex gap-2">
+                  <input
+                    type="url"
+                    name="image_url"
+                    id="input-image_url"
+                    placeholder="https://..."
+                    required
+                    class="flex-1 bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-white outline-none"
+                  />
+                  <label
+                    class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-700 transition"
+                  >
+                    <i class="fas fa-upload"></i>
+                    <input
+                      type="file"
+                      id="file-main-image"
+                      class="hidden"
+                      accept="image/*"
+                    />
+                  </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Main product image</p>
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs uppercase text-gray-500 font-bold mb-2"
+                  >Additional Images (Optional)</label
+                >
+                <div class="flex gap-2">
+                  <textarea
+                    name="additional_images"
+                    id="input-additional_images"
+                    placeholder="https://...&#10;https://..."
+                    rows="3"
+                    class="flex-1 bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-white outline-none"
+                  ></textarea>
+                  <label
+                    class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-700 transition h-fit"
+                  >
+                    <i class="fas fa-images"></i>
+                    <input
+                      type="file"
+                      id="file-additional-images"
+                      class="hidden"
+                      multiple
+                      accept="image/*"
+                    />
+                  </label>
+                </div>
                 <p class="text-xs text-gray-500 mt-1">
-                  Direct link to image (bucket or external)
+                  Enter one URL per line or comma-separated
                 </p>
               </div>
 

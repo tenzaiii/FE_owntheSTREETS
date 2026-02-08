@@ -301,6 +301,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('input-category').value = product.category;
             document.getElementById('input-type').value = product.type;
             document.getElementById('input-image_url').value = product.image_url;
+
+            // Populate Additional Images
+            const additionalImages = product.additional_images || [];
+            document.getElementById('input-additional_images').value = additionalImages.join('\n');
+
             document.getElementById('input-tag').value = product.tag || "";
 
             modalTitle.textContent = "Edit Product";
@@ -320,6 +325,74 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
+
+
+        // --- UPLOAD LOGIC ---
+        async function uploadFile(file) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { data, error } = await supabase.storage
+                .from('products')
+                .upload(filePath, file);
+
+            if (error) throw error;
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('products')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        }
+
+        const fileMain = document.getElementById('file-main-image');
+        if (fileMain) {
+            fileMain.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const btnLabel = fileMain.parentElement;
+                const originalContent = btnLabel.innerHTML;
+                btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                try {
+                    const publicUrl = await uploadFile(file);
+                    document.getElementById('input-image_url').value = publicUrl;
+                } catch (err) {
+                    alert("Upload failed: " + err.message);
+                } finally {
+                    btnLabel.innerHTML = originalContent;
+                }
+            });
+        }
+
+        const fileAdditional = document.getElementById('file-additional-images');
+        if (fileAdditional) {
+            fileAdditional.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+
+                const btnLabel = fileAdditional.parentElement;
+                const originalContent = btnLabel.innerHTML;
+                btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                try {
+                    const uploadPromises = files.map(file => uploadFile(file));
+                    const urls = await Promise.all(uploadPromises);
+
+                    const textarea = document.getElementById('input-additional_images');
+                    const currentVal = textarea.value.trim();
+                    textarea.value = currentVal ? currentVal + '\n' + urls.join('\n') : urls.join('\n');
+                } catch (err) {
+                    alert("Upload failed: " + err.message);
+                } finally {
+                    btnLabel.innerHTML = originalContent;
+                }
+            });
+        }
+
         if (formAdd) {
             formAdd.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -333,6 +406,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     category: formData.get('category'),
                     type: formData.get('type'),
                     image_url: formData.get('image_url'),
+                    // Parse Additional Images
+                    additional_images: formData.get('additional_images')
+                        ? formData.get('additional_images').split(/[\n,]+/).map(url => url.trim()).filter(url => url)
+                        : [],
                     tag: formData.get('tag') || null,
                     // Persist sizes if editing, or default if new. 
                     // Ideally we should have a sizes input, but for now we keep default.
