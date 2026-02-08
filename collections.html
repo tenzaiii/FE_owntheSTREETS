@@ -23,77 +23,37 @@
   </head>
 
   <body class="bg-black text-white">
-    <!-- Navbar -->
-    <nav
-      id="navbar"
-      class="sticky top-0 z-50 bg-black text-white transition-all duration-300"
-    >
-      <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between gap-3 py-3 sm:py-4">
-          <div class="flex items-center min-w-0">
-            <a
-              href="index.html"
-              class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight truncate"
-            >
-              owntheSTREETS
-            </a>
-          </div>
-
-          <div class="hidden lg:flex items-center space-x-8">
-            <a
-              href="index.html"
-              class="hover:text-gray-300 transition font-medium"
-              >HOME</a
-            >
-            <a
-              href="catalog.html"
-              class="hover:text-gray-300 transition font-medium"
-              >CATALOG</a
-            >
-            <a
-              href="#"
-              class="text-white font-bold underline underline-offset-4"
-              >COLLECTIONS</a
-            >
-            <a
-              href="catalog.html?tag=New"
-              class="hover:text-gray-300 transition font-medium"
-              >ARRIVALS</a
-            >
-          </div>
-
-          <div class="flex items-center space-x-6">
-            <a
-              href="login.html"
-              class="nav-user-link hover:text-gray-300 transition"
-            >
-              <i class="fas fa-user text-lg"></i>
-            </a>
-            <a
-              href="profile.html#cart"
-              class="hover:text-gray-300 transition relative"
-            >
-              <i class="fas fa-shopping-bag text-lg"></i>
-              <span
-                class="cart-badge absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden"
-                >0</span
-              >
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <!-- Header Container -->
+    <div id="header-container"></div>
 
     <!-- Header -->
     <header
-      class="py-16 md:py-24 px-4 text-center border-b border-gray-800 bg-gradient-to-b from-gray-900 to-black"
+      class="py-20 md:py-32 px-4 text-center border-b border-gray-800 bg-gradient-to-b from-gray-900 via-black to-black relative overflow-hidden"
     >
-      <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-4">
-        CURATED COLLECTIONS
-      </h1>
-      <p class="text-gray-400 max-w-2xl mx-auto text-lg">
-        Explore the finest selection from the world's leading streetwear brands.
-      </p>
+      <div class="absolute inset-0 opacity-20">
+        <div
+          class="absolute top-10 left-10 w-72 h-72 bg-purple-600 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute bottom-10 right-10 w-96 h-96 bg-blue-600 rounded-full blur-3xl"
+        ></div>
+      </div>
+      <div class="relative z-10">
+        <h1
+          class="text-5xl md:text-7xl font-black tracking-tighter mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent"
+        >
+          BRAND COLLECTIONS
+        </h1>
+        <p
+          class="text-gray-400 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed"
+        >
+          Explore unique identities from the world's most iconic streetwear
+          brands.<br />
+          <span class="text-sm text-gray-500 mt-2 block"
+            >Each collection tells its own story.</span
+          >
+        </p>
+      </div>
     </header>
 
     <!-- Collections Container -->
@@ -105,24 +65,132 @@
       <div class="text-center text-gray-500 py-12">Loading collections...</div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-black text-white py-16 border-t border-gray-800">
-      <div class="container mx-auto px-4 text-center">
-        <p class="text-gray-500">© 2024 owntheSTREETS Co., LLC.</p>
-      </div>
-    </footer>
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/products-loader.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/layout.js"></script>
     <script src="js/script.js"></script>
 
     <script>
-      document.addEventListener("productsLoaded", () => {
+      // Render header and footer
+      document.addEventListener("DOMContentLoaded", () => {
+        renderHeader("collections");
+        renderFooter();
+      });
+
+      // Brand Theme Configuration
+      const brandThemes = {
+        Essentials: {
+          gradient: "from-amber-50 via-stone-100 to-neutral-200",
+          textColor: "text-stone-900",
+          accentColor: "bg-stone-800",
+          borderColor: "border-stone-300",
+          hoverBorder: "hover:border-stone-800",
+          buttonBg: "bg-stone-900 hover:bg-stone-800",
+          buttonText: "text-stone-50",
+          tagline: "Minimalist Luxury",
+          vibe: "Clean, Modern, Timeless",
+        },
+        Stussy: {
+          gradient: "from-sky-400 via-blue-500 to-cyan-600",
+          textColor: "text-white",
+          accentColor: "bg-cyan-500",
+          borderColor: "border-cyan-400",
+          hoverBorder: "hover:border-white",
+          buttonBg: "bg-white hover:bg-cyan-50",
+          buttonText: "text-blue-900",
+          tagline: "Surf Culture",
+          vibe: "California Cool, Authentic",
+        },
+        "New Era": {
+          gradient: "from-red-600 via-blue-900 to-slate-800",
+          textColor: "text-white",
+          accentColor: "bg-red-600",
+          borderColor: "border-red-500",
+          hoverBorder: "hover:border-white",
+          buttonBg: "bg-red-600 hover:bg-red-700",
+          buttonText: "text-white",
+          tagline: "Sports Heritage",
+          vibe: "Athletic Tradition, Team Spirit",
+        },
+        "Chrome Hearts": {
+          gradient: "from-purple-950 via-slate-900 to-black",
+          textColor: "text-white",
+          accentColor: "bg-purple-600",
+          borderColor: "border-purple-500",
+          hoverBorder: "hover:border-purple-400",
+          buttonBg: "bg-purple-700 hover:bg-purple-600",
+          buttonText: "text-white",
+          tagline: "Gothic Luxury",
+          vibe: "Edgy Opulence, Rock & Roll",
+        },
+        Carhartt: {
+          gradient: "from-amber-700 via-yellow-800 to-green-900",
+          textColor: "text-white",
+          accentColor: "bg-amber-600",
+          borderColor: "border-amber-500",
+          hoverBorder: "hover:border-amber-300",
+          buttonBg: "bg-amber-700 hover:bg-amber-600",
+          buttonText: "text-white",
+          tagline: "Workwear Heritage",
+          vibe: "Rugged Authenticity, Durability",
+        },
+        "A Bathing Ape": {
+          gradient: "from-pink-500 via-fuchsia-600 to-green-500",
+          textColor: "text-white",
+          accentColor: "bg-green-400",
+          borderColor: "border-pink-400",
+          hoverBorder: "hover:border-green-400",
+          buttonBg:
+            "bg-gradient-to-r from-pink-500 to-green-500 hover:from-pink-600 hover:to-green-600",
+          buttonText: "text-white",
+          tagline: "Japanese Streetwear",
+          vibe: "Bold, Playful, Collectible",
+        },
+        Nike: {
+          gradient: "from-orange-500 via-black to-slate-900",
+          textColor: "text-white",
+          accentColor: "bg-orange-500",
+          borderColor: "border-orange-500",
+          hoverBorder: "hover:border-orange-400",
+          buttonBg: "bg-orange-600 hover:bg-orange-500",
+          buttonText: "text-white",
+          tagline: "Just Do It",
+          vibe: "Athletic Innovation, Performance",
+        },
+        "Human Made": {
+          gradient: "from-yellow-400 via-amber-500 to-orange-600",
+          textColor: "text-slate-900",
+          accentColor: "bg-yellow-500",
+          borderColor: "border-yellow-400",
+          hoverBorder: "hover:border-yellow-600",
+          buttonBg: "bg-yellow-600 hover:bg-yellow-500",
+          buttonText: "text-slate-900",
+          tagline: "Vintage Americana",
+          vibe: "Nostalgic, Artisanal, Heartfelt",
+        },
+      };
+
+      function renderCollections() {
         const container = document.getElementById("collections-container");
         const products = window.catalogProducts || [];
+
+        console.log(
+          "🎨 Rendering collections with",
+          products.length,
+          "products",
+        );
+
+        if (products.length === 0) {
+          container.innerHTML =
+            '<div class="text-center text-gray-500 py-12">No products available. Please check your database connection.</div>';
+          return;
+        }
 
         // Group by Brand
         const brands = {};
@@ -144,20 +212,32 @@
 
         sortedBrands.forEach((brand) => {
           const items = brands[brand].slice(0, 4); // Preview 4 items
+          const theme = brandThemes[brand] || {
+            gradient: "from-gray-800 to-gray-900",
+            textColor: "text-white",
+            accentColor: "bg-gray-700",
+            borderColor: "border-gray-600",
+            hoverBorder: "hover:border-white",
+            buttonBg: "bg-white hover:bg-gray-200",
+            buttonText: "text-black",
+            tagline: "Streetwear",
+            vibe: "Urban Style",
+          };
 
           const section = document.createElement("section");
-          section.className = "collection-block";
+          section.className = "collection-block group";
 
           let itemsHTML = items
             .map(
               (p) => `
-                    <a href="product.html?id=${p.id}" class="group block bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:border-white/50 transition-colors">
-                        <div class="aspect-square bg-gray-900 overflow-hidden relative">
-                             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500">
+                    <a href="product.html?id=${p.id}" class="group/item block bg-black/40 backdrop-blur-sm border ${theme.borderColor} rounded-xl overflow-hidden ${theme.hoverBorder} transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                        <div class="aspect-square bg-black/20 overflow-hidden relative">
+                             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain transform group-hover/item:scale-110 transition-transform duration-700">
+                             ${p.tag ? `<span class="absolute top-2 right-2 ${theme.accentColor} ${theme.buttonText} text-xs font-bold px-2 py-1 rounded-full">${p.tag}</span>` : ""}
                         </div>
                         <div class="p-4">
-                            <h3 class="font-bold text-sm truncate">${p.name}</h3>
-                            <p class="text-gray-400 text-xs mt-1">₱${p.price.toLocaleString("en-PH")}</p>
+                            <h3 class="font-bold text-sm truncate ${theme.textColor}">${p.name}</h3>
+                            <p class="${theme.textColor} opacity-80 text-xs mt-1">₱${p.price.toLocaleString("en-PH")}</p>
                         </div>
                     </a>
                 `,
@@ -165,28 +245,60 @@
             .join("");
 
           section.innerHTML = `
-                    <div class="flex items-end justify-between mb-6 border-b border-gray-800 pb-4">
-                        <div>
-                            <h2 class="text-3xl font-bold tracking-tight">${brand}</h2>
-                            <p class="text-sm text-gray-400 mt-1">${brands[brand].length} items</p>
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br ${theme.gradient} p-8 md:p-12 shadow-2xl transition-all duration-500 hover:shadow-3xl">
+                        <!-- Brand Header -->
+                        <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 pb-6 border-b-2 ${theme.borderColor}">
+                            <div class="mb-4 md:mb-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h2 class="text-4xl md:text-5xl font-black tracking-tighter ${theme.textColor}">${brand}</h2>
+                                    <span class="${theme.accentColor} ${theme.buttonText} text-xs font-bold px-3 py-1 rounded-full">${brands[brand].length}</span>
+                                </div>
+                                <p class="${theme.textColor} opacity-70 text-sm font-semibold uppercase tracking-wider">${theme.tagline}</p>
+                                <p class="${theme.textColor} opacity-60 text-xs mt-1 italic">${theme.vibe}</p>
+                            </div>
+                            <a href="catalog.html?brand=${encodeURIComponent(brand)}" 
+                               class="${theme.buttonBg} ${theme.buttonText} text-sm font-bold px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2">
+                                VIEW ALL
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
-                        <a href="catalog.html?brand=${encodeURIComponent(brand)}" class="text-sm font-bold border border-white px-4 py-2 rounded-full hover:bg-white hover:text-black transition-colors">
-                            VIEW ALL
-                        </a>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${itemsHTML}
+                        
+                        <!-- Product Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                            ${itemsHTML}
+                        </div>
+                        
+                        <!-- Decorative Elements -->
+                        <div class="absolute top-0 right-0 w-64 h-64 ${theme.accentColor} opacity-10 rounded-full blur-3xl -z-10"></div>
+                        <div class="absolute bottom-0 left-0 w-48 h-48 ${theme.accentColor} opacity-5 rounded-full blur-2xl -z-10"></div>
                     </div>
                 `;
 
           container.appendChild(section);
         });
+
+        console.log("✅ Collections rendered successfully");
+      }
+
+      // Listen for products loaded event
+      window.addEventListener("productsLoaded", () => {
+        console.log("📦 Products loaded event received");
+        renderCollections();
       });
 
-      // Trigger generic load interaction if products already ready
-      if (window.productsLoaded) {
-        window.dispatchEvent(new Event("productsLoaded"));
-      }
+      // Check if products are already loaded (in case event already fired)
+      setTimeout(() => {
+        if (
+          window.productsLoaded &&
+          window.catalogProducts &&
+          window.catalogProducts.length > 0
+        ) {
+          console.log("⚡ Products already loaded, rendering immediately");
+          renderCollections();
+        } else {
+          console.log("⏳ Waiting for products to load...");
+        }
+      }, 100);
     </script>
   </body>
 </html>

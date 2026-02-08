@@ -306,6 +306,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const additionalImages = product.additional_images || [];
             document.getElementById('input-additional_images').value = additionalImages.join('\n');
 
+            document.getElementById('input-description').value = product.description || "";
             document.getElementById('input-tag').value = product.tag || "";
 
             modalTitle.textContent = "Edit Product";
@@ -410,6 +411,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     additional_images: formData.get('additional_images')
                         ? formData.get('additional_images').split(/[\n,]+/).map(url => url.trim()).filter(url => url)
                         : [],
+                    description: formData.get('description') || null,
                     tag: formData.get('tag') || null,
                     // Persist sizes if editing, or default if new. 
                     // Ideally we should have a sizes input, but for now we keep default.
