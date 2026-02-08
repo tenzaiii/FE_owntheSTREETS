@@ -238,11 +238,23 @@ async function updateNavbarAuth() {
     userLinks.forEach(link => {
         if (user) {
             link.href = 'profile.html';
-            // Optional: Add a class to indicate logged in state if needed
         } else {
             link.href = 'login.html';
         }
     });
+
+    // Admin Link Injection
+    if (user && user.email === 'admin@ownthestreets.com') {
+        const navContainer = document.querySelector('.hidden.lg\\:flex.items-center.space-x-8');
+        if (navContainer && !document.getElementById('nav-admin-link')) {
+            const adminLink = document.createElement('a');
+            adminLink.id = 'nav-admin-link';
+            adminLink.href = 'admin.html';
+            adminLink.className = 'text-red-500 font-bold hover:text-red-400 transition';
+            adminLink.textContent = 'ADMIN DASHBOARD';
+            navContainer.appendChild(adminLink);
+        }
+    }
 }
 
 // Initialize UI on load

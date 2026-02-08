@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Initialize product page
-  function initProductPage() {
+  async function initProductPage() {
     // Set product details
     document.getElementById("product-breadcrumb").textContent = product.name;
     document.getElementById("product-brand").textContent = product.brand;
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSizes(sizes);
 
     // Check favorite status
-    state.isFavorite = Favorites.isFavorite(product.id);
+    state.isFavorite = await Favorites.isFavorite(product.id);
     updateFavoriteBtn();
 
     // Suggested products

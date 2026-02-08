@@ -146,41 +146,140 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function loadProducts() {
-        const { data: products } = await supabase.from('products').select('*').order('id');
+        // Elements
         const tbody = document.getElementById("products-table-body");
+        const searchInput = document.getElementById("product-search");
+        const filterBrand = document.getElementById("filter-brand");
+        const filterCategory = document.getElementById("filter-category");
 
-        if (!products || products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center">No products found.</td></tr>`;
-            return;
+        const btnAdd = document.getElementById("btn-add-product");
+        const modal = document.getElementById("modal-add-product");
+        const btnCloseModal = document.getElementById("modal-close-btn");
+        const formAdd = document.getElementById("form-add-product");
+
+        // --- FILTER LOGIC ---
+        const fetchAndRender = async () => {
+            let query = supabase.from('products').select('*').order('id', { ascending: false }); // Newest first
+
+            // Apply Filters
+            if (searchInput && searchInput.value.trim()) {
+                query = query.ilike('name', `%${searchInput.value.trim()}%`);
+            }
+            if (filterBrand && filterBrand.value) {
+                query = query.eq('brand', filterBrand.value);
+            }
+            if (filterCategory && filterCategory.value) {
+                query = query.eq('category', filterCategory.value);
+            }
+
+            const { data: products, error } = await query;
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            if (!products || products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center">No products found matching filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = products.map(p => `
+                <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="w-12 h-12 bg-gray-800 rounded overflow-hidden border border-gray-700">
+                            <img src="${p.image_url}" class="w-full h-full object-cover" onerror="this.src='IMG/esnlPlaceholder.jpg'">
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-white text-sm">${p.name}</td>
+                    <td class="px-6 py-4 text-xs uppercase text-gray-400">${p.brand}</td>
+                    <td class="px-6 py-4 text-xs text-gray-400">${p.category}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-white">₱${p.price.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/10 transition delete-product-btn" data-id="${p.id}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+             `).join("");
+
+            // Re-bind delete
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = btn.getAttribute('data-id');
+                    if (!confirm("Are you sure you want to permanently delete this product?")) return;
+
+                    const { error } = await supabase.from('products').delete().eq('id', id);
+                    if (error) {
+                        alert("Error deleting: " + error.message);
+                    } else {
+                        fetchAndRender(); // Reload
+                    }
+                });
+            });
+        };
+
+        // Event Listeners for Filters
+        if (searchInput) searchInput.addEventListener('input', fetchAndRender);
+        if (filterBrand) filterBrand.addEventListener('change', fetchAndRender);
+        if (filterCategory) filterCategory.addEventListener('change', fetchAndRender);
+
+        // --- MODAL LOGIC ---
+        if (btnAdd) {
+            btnAdd.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
         }
 
-        tbody.innerHTML = products.map(p => `
-            <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-                <td class="px-6 py-4">
-                    <div class="w-10 h-10 bg-gray-800 rounded overflow-hidden">
-                        <img src="${p.image_url}" class="w-full h-full object-cover">
-                    </div>
-                </td>
-                <td class="px-6 py-4 font-bold text-white">${p.name}</td>
-                <td class="px-6 py-4 text-xs uppercase">${p.brand}</td>
-                <td class="px-6 py-4 text-xs">${p.category}</td>
-                <td class="px-6 py-4 text-sm">₱${p.price.toLocaleString()}</td>
-                <td class="px-6 py-4 text-right">
-                    <button class="text-blue-500 hover:text-blue-400 mr-2 delete-product-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
-                    <button class="text-gray-400 hover:text-white"><i class="fas fa-edit"></i></button>
-                </td>
-            </tr>
-        `).join("");
-
-        document.querySelectorAll('.delete-product-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if (!confirm("Are you sure?")) return;
-                const id = btn.getAttribute('data-id');
-                const { error } = await supabase.from('products').delete().eq('id', id);
-                if (error) alert("Error deleting: " + error.message);
-                else loadProducts();
+        if (btnCloseModal) {
+            btnCloseModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             });
-        });
+        }
+
+        if (formAdd) {
+            formAdd.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(formAdd);
+                const newProduct = {
+                    name: formData.get('name'),
+                    price: parseFloat(formData.get('price')),
+                    brand: formData.get('brand'),
+                    category: formData.get('category'),
+                    type: formData.get('type'), // Added type
+                    image_url: formData.get('image_url'),
+                    tag: formData.get('tag') || null,
+                    sizes: ["S", "M", "L", "XL"] // Default sizes for now
+                };
+
+                const btn = formAdd.querySelector('button[type="submit"]');
+                const originalText = btn.textContent;
+                btn.textContent = "ADDING...";
+                btn.disabled = true;
+
+                try {
+                    const { data, error } = await supabase.from('products').insert([newProduct]);
+                    if (error) throw error;
+
+                    alert("Product added successfully!");
+                    formAdd.reset();
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    fetchAndRender(); // Update table
+                } catch (err) {
+                    alert("Error adding product: " + err.message);
+                    console.error(err);
+                } finally {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Initial Fetch
+        fetchAndRender();
     }
 
     async function loadCustomers() {
