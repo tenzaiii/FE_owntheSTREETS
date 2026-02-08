@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <p class="text-xs text-gray-500 uppercase font-bold">Order ID: #${order.id}</p>
                             <p class="text-xs text-gray-600">${new Date(order.created_at).toLocaleDateString()}</p>
                         </div>
-                        <span class="text-xs font-bold ${statusColor} border border-current px-2 py-1 rounded">${statusLabel}</span>
+                        <span class="text-xs font-bold ${statusColor} border border-current px-3 py-1 rounded-full">${statusLabel}</span>
                     </div>
                     
                     <div class="space-y-2 mb-4">
@@ -368,9 +368,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                              <p class="text-xs text-gray-500">Total Amount</p>
                              <p class="font-bold text-lg text-white">₱${order.total_amount.toLocaleString("en-PH")}</p>
                         </div>
-                        <!-- Action Buttons based on status -->
-                         ${order.status === 'pending' ? `<button class="text-xs bg-white text-black px-4 py-2 rounded-full font-bold hover:bg-gray-200 transition">PAY NOW</button>` : ''}
-                         ${(order.status === 'pending' || order.status === 'processing') ? `<button class="text-xs border border-red-500 text-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-500 hover:text-white transition cancel-order-btn" data-id="${order.id}">CANCEL</button>` : ''}
+                        <!-- Icon Action Buttons -->
+                        <div class="flex gap-2">
+                             ${order.status === 'pending' ? `
+                             <button class="text-green-500 hover:text-green-400 p-2 rounded-lg hover:bg-green-500/10 transition pay-now-btn" data-id="${order.id}" title="Pay Now">
+                                 <i class="fas fa-credit-card text-lg"></i>
+                             </button>` : ''}
+                             ${order.status === 'delivered' ? `
+                             <button class="text-blue-500 hover:text-blue-400 p-2 rounded-lg hover:bg-blue-500/10 transition reorder-btn" data-id="${order.id}" title="Order Again">
+                                 <i class="fas fa-redo text-lg"></i>
+                             </button>` : ''}
+                             ${(order.status === 'pending' || order.status === 'processing') ? `
+                             <button class="text-red-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/10 transition cancel-order-btn" data-id="${order.id}" title="Cancel Order">
+                                 <i class="fas fa-times-circle text-lg"></i>
+                             </button>` : ''}
+                        </div>
                     </div>
                 </div>
              `;
@@ -393,6 +405,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                 } else {
                     alert("Order cancelled successfully.");
                     fetchOrders(); // Refresh list
+                }
+            });
+        });
+
+        // Pay Now Button (placeholder)
+        ordersList.querySelectorAll('.pay-now-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const orderId = e.currentTarget.dataset.id;
+                alert(`Payment for Order #${orderId}\n\nRedirecting to payment page...\n(Payment integration coming soon!)`);
+            });
+        });
+
+        // Reorder Button (placeholder)
+        ordersList.querySelectorAll('.reorder-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const orderId = e.currentTarget.dataset.id;
+                const order = userOrders.find(o => o.id == orderId);
+                if (order && confirm(`Add all items from Order #${orderId} to your cart?`)) {
+                    alert('Items added to cart!\n(Reorder functionality coming soon!)');
                 }
             });
         });
