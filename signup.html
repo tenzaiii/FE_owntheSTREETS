@@ -55,16 +55,7 @@
 
           <!-- Desktop Navigation -->
           <div class="hidden lg:flex items-center space-x-8">
-            <a
-              href="index.html"
-              class="hover:text-gray-300 transition font-medium"
-              >HOME</a
-            >
-            <a
-              href="catalog.html"
-              class="hover:text-gray-300 transition font-medium"
-              >CATALOG</a
-            >
+            <!-- Navigation Links Removed for Signup Page -->
           </div>
         </div>
       </div>
@@ -106,7 +97,7 @@
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div class="relative">
               <label for="password" class="sr-only">Password</label>
               <input
                 id="password"
@@ -114,11 +105,18 @@
                 type="password"
                 autocomplete="new-password"
                 required
-                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm"
+                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm pr-10"
                 placeholder="Password"
               />
+              <button
+                type="button"
+                id="toggle-password"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
             </div>
-            <div>
+            <div class="relative">
               <label for="confirm-password" class="sr-only"
                 >Confirm Password</label
               >
@@ -128,9 +126,16 @@
                 type="password"
                 autocomplete="new-password"
                 required
-                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm"
+                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm pr-10"
                 placeholder="Confirm Password"
               />
+              <button
+                type="button"
+                id="toggle-confirm-password"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
             </div>
           </div>
 
@@ -201,9 +206,31 @@
 
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-    <script src="supabase-client.js"></script>
-    <script src="utils.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/utils.js"></script>
     <script>
+      function setupPasswordToggle(toggleId, inputId) {
+        document
+          .getElementById(toggleId)
+          .addEventListener("click", function () {
+            const input = document.getElementById(inputId);
+            const icon = this.querySelector("i");
+
+            if (input.type === "password") {
+              input.type = "text";
+              icon.classList.remove("fa-eye");
+              icon.classList.add("fa-eye-slash");
+            } else {
+              input.type = "password";
+              icon.classList.remove("fa-eye-slash");
+              icon.classList.add("fa-eye");
+            }
+          });
+      }
+
+      setupPasswordToggle("toggle-password", "password");
+      setupPasswordToggle("toggle-confirm-password", "confirm-password");
+
       document
         .getElementById("password")
         .addEventListener("input", function (e) {

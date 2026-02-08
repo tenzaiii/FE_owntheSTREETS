@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     input.setAttribute("data-filter-group", "brand");
                     input.setAttribute("data-filter-value", brand);
 
+                    // Check if this brand is already active in state
+                    if (state.filters.brand.includes(brand)) {
+                        input.checked = true;
+                    }
+
                     label.appendChild(span);
                     label.appendChild(input);
                     brandFilterContainer.appendChild(label);

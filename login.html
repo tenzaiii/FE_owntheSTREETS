@@ -56,16 +56,7 @@
 
           <!-- Desktop Navigation -->
           <div class="hidden lg:flex items-center space-x-8">
-            <a
-              href="index.html"
-              class="hover:text-gray-300 transition font-medium"
-              >HOME</a
-            >
-            <a
-              href="catalog.html"
-              class="hover:text-gray-300 transition font-medium"
-              >CATALOG</a
-            >
+            <!-- Navigation Links Removed for Login Page -->
           </div>
 
           <!-- Right Icons -->
@@ -102,7 +93,7 @@
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div class="relative">
               <label for="password" class="sr-only">Password</label>
               <input
                 id="password"
@@ -110,13 +101,32 @@
                 type="password"
                 autocomplete="current-password"
                 required
-                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm"
+                class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-900 placeholder-gray-500 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm pr-10"
                 placeholder="Password"
               />
+              <button
+                type="button"
+                id="toggle-password"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
             </div>
           </div>
 
-          <div class="flex items-center justify-end">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                class="h-4 w-4 text-white focus:ring-white border-gray-600 rounded bg-gray-900"
+              />
+              <label for="remember-me" class="ml-2 block text-sm text-gray-400">
+                Remember me
+              </label>
+            </div>
+
             <div class="text-sm">
               <a
                 href="forgot-password.html"
@@ -161,18 +171,40 @@
 
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-    <script src="supabase-client.js"></script>
-    <script src="utils.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/utils.js"></script>
     <script>
+      document
+        .getElementById("toggle-password")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("password");
+          const icon = this.querySelector("i");
+
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        });
+
       document
         .getElementById("login-form")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const email = document.getElementById("email").value;
           const password = document.getElementById("password").value;
+          // Remember Me Logic (Optional: Pass to Auth or store locally if using session)
+          const rememberMe = document.getElementById("remember-me").checked;
+
+          // Supabase handles session persistence automatically by default,
+          // but we can explicitly set persistence if needed.
+          // For now, we just proceed with login.
 
           const result = await Auth.login(email, password);
-
           if (result.success) {
             if (email.toLowerCase() === "admin@ownthestreets.com") {
               window.location.href = "admin.html";
