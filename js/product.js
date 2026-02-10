@@ -185,31 +185,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Add to cart handler
+  // Add to cart handler - Open shared modal
   document.getElementById("product-add-to-cart").addEventListener("click", () => {
     if (!Auth.getCurrentUser()) {
       window.location.href = 'login.html';
       return;
     }
 
-    if (!state.selectedSize) {
-      const sizeError = document.getElementById("product-size-error");
-      sizeError.textContent = "Please select a size";
-      sizeError.classList.remove("hidden");
-      return;
+    // Use shared CartModal utility
+    if (window.CartModal) {
+      CartModal.open(product);
+    } else {
+      console.error('CartModal utility not found');
     }
-
-    Cart.addItem(product, 1, state.selectedSize);
-
-    // Show success feedback
-    const btn = document.getElementById("product-add-to-cart");
-    const originalText = btn.textContent;
-    btn.textContent = "Added to Bag!";
-    btn.classList.add("bg-green-500", "hover:bg-green-600");
-    setTimeout(() => {
-      btn.textContent = originalText;
-      btn.classList.remove("bg-green-500", "hover:bg-green-600");
-    }, 2000);
   });
 
   function updateFavoriteBtn() {

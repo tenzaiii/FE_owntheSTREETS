@@ -266,17 +266,20 @@
         >
           <div class="flex gap-4">
             <input
+              id="order-search"
               type="text"
               placeholder="Search orders..."
               class="bg-black border border-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white"
             />
             <select
+              id="order-status-filter"
               class="bg-black border border-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none"
             >
-              <option>All Status</option>
-              <option>Pending</option>
-              <option>Processing</option>
-              <option>Shipped</option>
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
             </select>
           </div>
         </div>
@@ -581,6 +584,7 @@
             >
               <tr>
                 <th class="px-6 py-4">Image</th>
+                <th class="px-6 py-4">SKU</th>
                 <th class="px-6 py-4">Name</th>
                 <th class="px-6 py-4">Brand</th>
                 <th class="px-6 py-4">Category</th>

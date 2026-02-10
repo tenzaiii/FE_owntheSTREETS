@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-700 hover:border-white hover:bg-white hover:text-black transition-colors"
                 type="button"
                 aria-label="Add to bag"
-                onclick="event.preventDefault(); if(!Auth.getCurrentUser()) { window.location.href='login.html'; return; } Cart.addItem(window.catalogProducts.find(p => p.id === ${product.id}), 1, 'One Size')"
+                onclick="event.preventDefault(); if(!Auth.getCurrentUser()) { window.location.href='login.html'; return; } if(window.CartModal) { CartModal.open(window.catalogProducts.find(p => p.id === ${product.id})); } else { console.error('CartModal not found'); }"
               >
                 <i class="fas fa-shopping-bag text-sm"></i>
               </button>

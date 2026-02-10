@@ -113,6 +113,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         `).join("");
     }
 
+    let allOrders = []; // Store all orders for filtering
+
     async function loadOrders() {
         const { data: orders, error } = await supabase
             .from('orders')
@@ -121,7 +123,57 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (error) console.error(error);
 
+        allOrders = orders || []; // Store for filtering
+        renderOrdersTable(allOrders);
+
+        // Attach search and filter listeners
+        const searchInput = document.getElementById('order-search');
+        const statusFilter = document.getElementById('order-status-filter');
+
+        if (searchInput && statusFilter) {
+            // Remove old listeners by cloning
+            const newSearchInput = searchInput.cloneNode(true);
+            const newStatusFilter = statusFilter.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            statusFilter.parentNode.replaceChild(newStatusFilter, statusFilter);
+
+            // Add new listeners
+            newSearchInput.addEventListener('input', filterOrders);
+            newStatusFilter.addEventListener('change', filterOrders);
+        }
+    }
+
+    function filterOrders() {
+        const searchInput = document.getElementById('order-search');
+        const statusFilter = document.getElementById('order-status-filter');
+
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const statusValue = statusFilter?.value || 'all';
+
+        let filtered = allOrders;
+
+        // Filter by status
+        if (statusValue !== 'all') {
+            filtered = filtered.filter(o => o.status === statusValue);
+        }
+
+        // Filter by search term (order ID, email, amount)
+        if (searchTerm) {
+            filtered = filtered.filter(o => {
+                const orderId = `#${o.id}`.toLowerCase();
+                const email = (o.guest_email || '').toLowerCase();
+                const amount = o.total_amount.toString();
+                return orderId.includes(searchTerm) || email.includes(searchTerm) || amount.includes(searchTerm);
+            });
+        }
+
+        renderOrdersTable(filtered);
+    }
+
+    function renderOrdersTable(orders) {
         const tbody = document.getElementById("orders-table-body");
+        if (!tbody) return;
+
         if (!orders || orders.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-gray-500">No orders found.</td></tr>`;
             return;
@@ -132,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td class="px-6 py-4 font-mono text-xs">#${o.id}</td>
                 <td class="px-6 py-4 text-xs">${new Date(o.created_at).toLocaleDateString()}</td>
                 <td class="px-6 py-4">
-                    <div class="text-sm font-bold text-white">${o.guest_email || 'Register User'}</div>
+                    <div class="text-sm font-bold text-white">${o.guest_email || 'Registered User'}</div>
                 </td>
                 <td class="px-6 py-4 text-xs text-gray-500">View Details (TODO)</td>
                 <td class="px-6 py-4 font-bold text-white">₱${o.total_amount.toLocaleString()}</td>
@@ -156,9 +208,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const id = e.target.getAttribute('data-id');
                 const status = e.target.value;
                 await supabase.from('orders').update({ status }).eq('id', id);
-                // Feedback?
+                // Feedback
                 e.target.classList.add('text-green-500');
                 setTimeout(() => e.target.classList.remove('text-green-500'), 1000);
+
+                // Update local data
+                const order = allOrders.find(o => o.id == id);
+                if (order) order.status = status;
             });
         });
     }
@@ -200,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (!products || products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center">No products found matching filters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center">No products found matching filters.</td></tr>`;
                 return;
             }
 
@@ -212,6 +268,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ${p.is_hidden ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><i class="fas fa-eye-slash text-white text-xs"></i></div>' : ''}
                         </div>
                     </td>
+                    <td class="px-6 py-4 font-mono text-xs text-gray-400">#${p.id}</td>
                     <td class="px-6 py-4 font-bold text-white text-sm">
                         ${p.name}
                         ${p.is_hidden ? '<span class="ml-2 text-xs text-red-500 font-normal border border-red-500 px-1 rounded">HIDDEN</span>' : ''}

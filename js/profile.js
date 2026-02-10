@@ -516,7 +516,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <div class="flex justify-between items-start gap-2">
                             <div>
                                 <h3 class="font-bold text-sm line-clamp-1"><a href="product.html?id=${item.id}">${item.name}</a></h3>
-                                <p class="text-xs text-gray-400">Size: ${item.selectedSize || "OS"}</p>
+                                <p class="text-xs text-gray-400">Size: ${item.size || "One Size"}</p>
                             </div>
                             <button class="text-gray-500 hover:text-white remove-cart-btn" data-id="${item.id}">
                                 <i class="fas fa-trash"></i>
@@ -709,7 +709,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     order_id: order.id,
                     product_id: item.id,
                     quantity: item.quantity,
-                    size: item.selectedSize || "OS",
+                    size: item.size || "One Size",
                     price_at_time: item.price,
                     product_name: item.name
                 }));
@@ -728,7 +728,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 checkoutModal.classList.remove('flex');
                 checkoutForm.reset();
 
-                alert(`Order #${order.id} placed successfully via ${paymentMethod.toUpperCase()}!`);
+                // Show success toast
+                if (window.Toast) {
+                    Toast.success(`Order #${order.id} placed successfully via ${paymentMethod.toUpperCase()}! 🎉`, 4000);
+                } else {
+                    alert(`Order #${order.id} placed successfully via ${paymentMethod.toUpperCase()}!`);
+                }
 
             } catch (err) {
                 console.error('Order Logic Error:', err);
